@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 bon = "3.6.4"
+time = "0.3.41"

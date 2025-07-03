@@ -7,5 +7,7 @@ fn main() {
             .version("0.0.0")
             .contact("playamethyst.com")
             .build(),
-    ));
+    ))
+    .pat_expires("h".to_string(), 31, 12, 2025);
+    println!("{:?}", auth);
 }
