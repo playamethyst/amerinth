@@ -1,20 +1,18 @@
 use crate::ModrinthError;
 pub use auth::AuthState;
 use auth::*;
-pub use http::HttpClient;
-use reqwest::Client;
+use rustify::clients::reqwest::Client;
 use time::{Date, Month};
 pub use user_agent::UserAgent;
 
 mod auth;
-mod http;
 mod user_agent;
 
 /// Authentication for the Modrinth API
 pub struct Modrinth<State: AuthState> {
     state: State,
     staging: bool,
-    client: Client,
+    pub(crate) client: Client,
 }
 
 fn new_modrinth(
@@ -34,7 +32,11 @@ fn new_modrinth(
     Ok(Modrinth {
         state: Unauthenticated,
         staging,
-        client: Client::builder().user_agent(user_agent).build()?,
+        client: Client::new(if staging {
+            "https://staging-api.modrinth.com/v2"
+        } else {
+            "https://api.modrinth.com/v2"
+        }, reqwest::Client::builder().user_agent(user_agent).build()?),
     })
 }
 

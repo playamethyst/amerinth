@@ -1,14 +1,12 @@
 // todo:
 // - GET /updates/{id|slug}/forge_updates.json
 
-use crate::{
-    Modrinth, ModrinthError,
-    client::{AuthState, HttpClient},
-};
+use crate::{Modrinth, ModrinthError, client::AuthState};
+use rustify::{errors::ClientError, Endpoint};
+use rustify_derive::Endpoint;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-#[allow(dead_code)]
 pub struct Statistics {
     /// Number of projects on Modrinth
     projects: usize,
@@ -20,13 +18,16 @@ pub struct Statistics {
     authors: usize,
 }
 
+#[derive(Endpoint)]
+#[endpoint(method = "GET", path = "statistics", response = "Statistics")]
+pub struct GetStatistics;
+
 /// ### GET `/statistics`
 pub async fn statistics<State: AuthState>(
-    auth: &Modrinth<State>,
-) -> Result<Statistics, ModrinthError>
+    modrinth: &Modrinth<State>,
+) -> Result<Statistics, ClientError>
 where
     State: AuthState,
-    Modrinth<State>: HttpClient,
 {
-    auth.get("/statistics").await
+    GetStatistics.exec(&modrinth.client).await?.parse()
 }
