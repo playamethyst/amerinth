@@ -6,6 +6,8 @@
 
 - rate limiting
 - blocking api
+- oauth
+- tracing
 - utilities
     - mrpack downloader
     - curseforge -> modrinth
@@ -59,7 +61,7 @@
     - [ ] `/user/{id|username}`
         - [ ] GET
         - [ ] PATCH
-    - [ ] GET `/user`
+    - [x] GET `/user`
     - [ ] GET `/users`
     - [ ] `/user/{id|username}/icon`
         - [ ] DELETE

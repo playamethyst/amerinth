@@ -1,4 +1,4 @@
-use amerinth::{Modrinth, UserAgent, misc};
+use amerinth::{Modrinth, UserAgent, users};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -14,9 +14,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .build(),
         ),
     )?
-    .pat_expires("h".to_string(), 31, 12, 2025)?;
+    .pat(std::env::var("PAT")?, 31, 7, 2025)?;
 
-    let payload = misc::forge(&auth, "fabric-apdsadsai").await?;
+    let payload = users::current(&auth).await?;
     println!("{:?}", payload);
 
     Ok(())

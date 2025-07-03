@@ -1,3 +1,6 @@
+#[cfg(feature = "users")]
+pub mod users;
+
 #[cfg(feature = "misc")]
 pub mod misc {
     mod forge;

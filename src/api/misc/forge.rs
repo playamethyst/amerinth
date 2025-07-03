@@ -1,9 +1,8 @@
-use reqwest::Client;
 
 use crate::prelude::*;
 use std::collections::HashMap;
 
-/// Mod version information that can be consumed by Forge’s update checker
+/// Mod version information that can be consumed by Forge's update checker
 #[derive(Debug, Deserialize)]
 pub struct ForgeUpdates {
     /// A link to the mod page

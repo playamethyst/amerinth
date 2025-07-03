@@ -1,7 +1,7 @@
 use crate::ModrinthError;
-pub use auth::AuthState;
 use auth::*;
-use rustify::clients::reqwest::Client;
+pub use auth::{AuthMiddleware, AuthState, Authenticated};
+use rustify::{clients::reqwest::Client, errors::ClientError};
 use time::{Date, Month};
 pub use user_agent::UserAgent;
 
@@ -9,8 +9,11 @@ mod auth;
 mod user_agent;
 
 /// Authentication for the Modrinth API
-pub struct Modrinth<State: AuthState> {
-    state: State,
+pub struct Modrinth<Auth>
+where
+    Auth: AuthState,
+{
+    auth: Auth,
     pub(crate) client: Client,
 }
 
@@ -37,42 +40,36 @@ impl Modrinth<Unauthenticated> {
             .to_string();
 
         Ok(Modrinth {
-            state: Unauthenticated,
+            auth: Unauthenticated,
             client: Client::new(
                 if staging {
                     "https://staging-api.modrinth.com"
                 } else {
                     "https://api.modrinth.com"
                 },
-                reqwest::Client::builder().user_agent(user_agent).build()?,
+                reqwest::Client::builder()
+                    .user_agent(user_agent)
+                    .build()
+                    .map_err(|source| ClientError::ReqwestBuildError { source })?,
             ),
         })
     }
 
     /// Authenticate a Modrinth client with a [Personal Access Token](https://modrinth.com/settings/pats) (PAT).
-    pub fn pat(self, token: String) -> Modrinth<PAT> {
-        Modrinth {
-            state: PAT(token, None),
-            client: self.client,
-        }
-    }
-
-    /// Authenticate a Modrinth client with a [Personal Access Token](https://modrinth.com/settings/pats) (PAT)
-    /// that expires on a specific date.
-    pub fn pat_expires(
+    pub fn pat(
         self,
         token: String,
         day: u8,
         month: u8,
         year: i32,
-    ) -> Result<Modrinth<PAT>, ModrinthError> {
-        // figure out the expiration date
+    ) -> Result<Modrinth<Pat>, ModrinthError> {
+        // encode the expiration date
         let month = Month::try_from(month)?;
         let date = Date::from_calendar_date(year, month, day)?;
         let expires_at = date.with_hms(23, 59, 59)?.assume_utc();
 
         Ok(Modrinth {
-            state: PAT(token, Some(expires_at)),
+            auth: Pat(token, expires_at),
             client: self.client,
         })
     }

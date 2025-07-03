@@ -23,5 +23,5 @@ pub async fn statistics<State>(modrinth: &Modrinth<State>) -> Result<Statistics,
 where
     State: AuthState,
 {
-    Ok(GetStatistics.exec(&modrinth.client).await?.parse()?)
+    GetStatistics.exec(&modrinth.client).await?.parse()
 }

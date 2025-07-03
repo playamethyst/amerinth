@@ -31,6 +31,7 @@ name = "amerinth"
 version = "2.0.0"
 dependencies = [
  "bon",
+ "http",
  "reqwest",
  "rustify",
  "rustify_derive",

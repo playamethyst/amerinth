@@ -1,7 +1,10 @@
+use crate::Modrinth;
+use http::{HeaderValue, Request, Response};
+use rustify::{Endpoint, errors::ClientError};
 use time::OffsetDateTime;
 
 /// An authentication state for the Modrinth API.
-pub trait AuthState {}
+pub trait AuthState: Send + Sync {}
 
 /// The unauthenticated state of the Modrinth client.
 pub struct Unauthenticated;
@@ -17,22 +20,60 @@ pub trait Authenticated: AuthState {
 }
 
 /// Authentication using a [Personal Access Token](https://modrinth.com/settings/pats).
-pub struct PAT(pub(crate) String, pub(crate) Option<OffsetDateTime>);
-impl AuthState for PAT {}
+pub struct Pat(pub(crate) String, pub(crate) OffsetDateTime);
+impl AuthState for Pat {}
 
-impl Authenticated for PAT {
+impl Authenticated for Pat {
     fn header(&self) -> String {
         self.0.clone()
     }
 
     fn is_valid(&self) -> bool {
-        if let Some(expires_at) = self.1 {
-            OffsetDateTime::now_utc() < expires_at
-        } else {
-            // if no expiration date is set, assume the token is valid indefinitely
-            true
-        }
+        OffsetDateTime::now_utc() < self.1
     }
 }
 
-// todo: OAuth
+/// Middleware to insert authentication into Rustify clients.
+pub struct AuthMiddleware<'a, Auth>(pub(crate) &'a Modrinth<Auth>)
+where
+    Auth: AuthState;
+
+impl rustify::MiddleWare for AuthMiddleware<'_, Unauthenticated> {
+    fn request<E: Endpoint>(&self, _: &E, _: &mut Request<Vec<u8>>) -> Result<(), ClientError> {
+        Ok(())
+    }
+
+    fn response<E: Endpoint>(&self, _: &E, _: &mut Response<Vec<u8>>) -> Result<(), ClientError> {
+        Ok(())
+    }
+}
+
+impl<Auth> rustify::MiddleWare for AuthMiddleware<'_, Auth>
+where
+    Auth: Authenticated,
+{
+    fn request<E: Endpoint>(
+        &self,
+        endpoint: &E,
+        req: &mut Request<Vec<u8>>,
+    ) -> Result<(), ClientError> {
+        // todo: check if the authorization is still valid first
+
+        let url = endpoint.url(&self.0.client.base)?.to_string();
+        let auth_header =
+            HeaderValue::from_str(self.0.auth.header().as_str()).map_err(|source| {
+                ClientError::RequestBuildError {
+                    source: source.into(),
+                    method: endpoint.method(),
+                    url,
+                }
+            })?;
+        req.headers_mut().append("Authorization", auth_header);
+
+        Ok(())
+    }
+
+    fn response<E: Endpoint>(&self, _: &E, _: &mut Response<Vec<u8>>) -> Result<(), ClientError> {
+        Ok(())
+    }
+}
