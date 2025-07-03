@@ -7,8 +7,8 @@ mod client;
 /// An error that can occur when using the Modrinth API.
 #[derive(Debug, thiserror::Error)]
 pub enum ModrinthError {
-    #[error("Invalid date provided for expiration: {0}")]
-    InvalidDate(#[from] time::error::ComponentRange),
+    #[error("Invalid date provided for expiration: {0}/{1}/{2}")]
+    InvalidDate(u8, u8, i32),
     #[error("Token is invalid or expired")]
     InvalidToken,
     #[error("Failed to parse response: {0}")]

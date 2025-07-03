@@ -1,7 +1,7 @@
 use crate::Modrinth;
+use chrono::{DateTime, Utc};
 use http::{HeaderValue, Request, Response};
 use rustify::{Endpoint, errors::ClientError};
-use time::OffsetDateTime;
 
 /// An authentication state for the Modrinth API.
 pub trait AuthState: Send + Sync {}
@@ -20,7 +20,7 @@ pub trait Authenticated: AuthState {
 }
 
 /// Authentication using a [Personal Access Token](https://modrinth.com/settings/pats).
-pub struct Pat(pub(crate) String, pub(crate) OffsetDateTime);
+pub struct Pat(pub(crate) String, pub(crate) DateTime<Utc>);
 impl AuthState for Pat {}
 
 impl Authenticated for Pat {
@@ -29,7 +29,7 @@ impl Authenticated for Pat {
     }
 
     fn is_valid(&self) -> bool {
-        OffsetDateTime::now_utc() < self.1
+        self.1 > Utc::now()
     }
 }
 

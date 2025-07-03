@@ -1,8 +1,8 @@
 use crate::ModrinthError;
 use auth::*;
 pub use auth::{AuthMiddleware, AuthState, Authenticated};
+use chrono::{NaiveDate, TimeZone, Utc};
 use rustify::{clients::reqwest::Client, errors::ClientError};
-use time::{Date, Month};
 pub use user_agent::UserAgent;
 
 mod auth;
@@ -64,9 +64,12 @@ impl Modrinth<Unauthenticated> {
         year: i32,
     ) -> Result<Modrinth<Pat>, ModrinthError> {
         // encode the expiration date
-        let month = Month::try_from(month)?;
-        let date = Date::from_calendar_date(year, month, day)?;
-        let expires_at = date.with_hms(23, 59, 59)?.assume_utc();
+        let date = NaiveDate::from_ymd_opt(year, month as u32, day as u32)
+            .ok_or_else(|| ModrinthError::InvalidDate(day, month, year))?;
+        let expires_at = date
+            .and_hms_opt(23, 59, 59)
+            .ok_or_else(|| ModrinthError::InvalidDate(day, month, year))?;
+        let expires_at = Utc.from_utc_datetime(&expires_at);
 
         Ok(Modrinth {
             auth: Pat(token, expires_at),
