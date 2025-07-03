@@ -1,3 +1,5 @@
+use reqwest::Client;
+
 use crate::prelude::*;
 use std::collections::HashMap;
 
@@ -30,19 +32,31 @@ pub struct GetForgeUpdates {
     query: String,
 }
 
+#[derive(Debug, Error)]
+pub enum ForgeError {
+    #[error(r#"Project "{0}" does not exist."#)]
+    DoesNotExist(String),
+    #[error(transparent)]
+    Other(#[from] ClientError),
+}
+
 /// ### GET `/updates/{id|slug}/forge_updates.json`
 /// Forge Updates JSON file
 pub async fn forge<State>(
     modrinth: &Modrinth<State>,
     query: impl Into<String>,
-) -> Result<ForgeUpdates, ModrinthError>
+) -> Result<ForgeUpdates, ForgeError>
 where
     State: AuthState,
 {
-    Ok(GetForgeUpdates {
-        query: query.into(),
+    let query = query.into();
+    let req = GetForgeUpdates {
+        query: query.clone(),
+    };
+    match req.exec(&modrinth.client).await {
+        Ok(res) => Ok(res.parse()?),
+        // this endpoint only has one possible error - does not exist
+        // see: https://github.com/modrinth/code/blob/9dc56442644d8bd8ad2eb67f07cb2763b3a2fe30/apps/labrinth/src/routes/updates.rs#L41
+        Err(_) => Err(ForgeError::DoesNotExist(query)),
     }
-    .exec(&modrinth.client)
-    .await?
-    .parse()?)
 }

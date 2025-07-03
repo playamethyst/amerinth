@@ -1,4 +1,4 @@
 alias r := run
 
 run name="main":
-    cargo r --example {{name}}
+    cargo r --example {{name}} --features all

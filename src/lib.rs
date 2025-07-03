@@ -17,10 +17,12 @@ pub enum ModrinthError {
     ClientError(#[from] rustify::errors::ClientError),
 }
 
+#[allow(unused_imports)]
 pub(crate) mod prelude {
-    pub(crate) use crate::ModrinthError;
     pub(crate) use crate::client::{AuthState, Modrinth};
     pub(crate) use rustify::Endpoint;
+    pub(crate) use rustify::errors::ClientError;
     pub(crate) use rustify_derive::Endpoint;
     pub(crate) use serde::Deserialize;
+    pub(crate) use thiserror::Error;
 }

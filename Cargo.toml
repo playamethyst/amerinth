@@ -5,6 +5,9 @@ edition = "2024"
 
 [features]
 default = []
+all = ["misc"]
+
+# modules
 misc = []
 
 [dependencies]

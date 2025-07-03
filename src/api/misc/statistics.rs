@@ -19,7 +19,7 @@ struct GetStatistics;
 
 /// ### GET `/statistics`
 /// Get various statistics about this Modrinth instance.
-pub async fn statistics<State>(modrinth: &Modrinth<State>) -> Result<Statistics, ModrinthError>
+pub async fn statistics<State>(modrinth: &Modrinth<State>) -> Result<Statistics, ClientError>
 where
     State: AuthState,
 {

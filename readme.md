@@ -6,7 +6,6 @@
 
 - rate limiting
 - blocking api
-- proper error handling
 - utilities
     - mrpack downloader
     - curseforge -> modrinth
