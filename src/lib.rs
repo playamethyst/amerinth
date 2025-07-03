@@ -6,6 +6,8 @@ pub use client::{Modrinth, UserAgent};
 // - curseforge -> modrinth
 
 // todo: blocking apis
+// todo: rate limits
+// todo: proper error handling
 
 mod api;
 mod client;
@@ -19,4 +21,14 @@ pub enum ModrinthError {
     InvalidDate(#[from] time::error::ComponentRange),
     #[error("Token is invalid or expired")]
     InvalidToken,
+    #[error("Failed to parse response: {0}")]
+    ClientError(#[from] rustify::errors::ClientError),
+}
+
+pub(crate) mod prelude {
+    pub(crate) use crate::ModrinthError;
+    pub(crate) use crate::client::{AuthState, Modrinth};
+    pub(crate) use rustify::Endpoint;
+    pub(crate) use rustify_derive::Endpoint;
+    pub(crate) use serde::Deserialize;
 }

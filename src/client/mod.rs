@@ -11,33 +11,7 @@ mod user_agent;
 /// Authentication for the Modrinth API
 pub struct Modrinth<State: AuthState> {
     state: State,
-    staging: bool,
     pub(crate) client: Client,
-}
-
-fn new_modrinth(
-    staging: bool,
-    user_agent: Option<UserAgent>,
-) -> Result<Modrinth<Unauthenticated>, ModrinthError> {
-    let user_agent = user_agent
-        .unwrap_or({
-            UserAgent::builder(env!("CARGO_PKG_NAME"))
-                .version(env!("CARGO_PKG_VERSION"))
-                .author("getamethyst")
-                .contact("playamethyst.com")
-                .build()
-        })
-        .to_string();
-
-    Ok(Modrinth {
-        state: Unauthenticated,
-        staging,
-        client: Client::new(if staging {
-            "https://staging-api.modrinth.com/v2"
-        } else {
-            "https://api.modrinth.com/v2"
-        }, reqwest::Client::builder().user_agent(user_agent).build()?),
-    })
 }
 
 impl Modrinth<Unauthenticated> {
@@ -48,24 +22,37 @@ impl Modrinth<Unauthenticated> {
     /// and let the Modrinth team contact you if necessary. While it is not required
     /// in the context of this library, it is highly recommended to provide a user agent.
     /// If one is not provided, a default user agent identifying `amerinth` will be used.
-    pub fn new(user_agent: Option<UserAgent>) -> Result<Modrinth<Unauthenticated>, ModrinthError> {
-        new_modrinth(false, user_agent)
-    }
-
-    /// Create a new unauthenticated client that can communicate with the Modrinth API in staging mode.
-    ///
-    /// See the documentation for [Modrinth::new] for more information about the [Modrinth] client.
-    pub fn staging(
+    pub fn new(
+        staging: bool,
         user_agent: Option<UserAgent>,
     ) -> Result<Modrinth<Unauthenticated>, ModrinthError> {
-        new_modrinth(true, user_agent)
+        let user_agent = user_agent
+            .unwrap_or({
+                UserAgent::builder(env!("CARGO_PKG_NAME"))
+                    .version(env!("CARGO_PKG_VERSION"))
+                    .author("getamethyst")
+                    .contact("playamethyst.com")
+                    .build()
+            })
+            .to_string();
+
+        Ok(Modrinth {
+            state: Unauthenticated,
+            client: Client::new(
+                if staging {
+                    "https://staging-api.modrinth.com"
+                } else {
+                    "https://api.modrinth.com"
+                },
+                reqwest::Client::builder().user_agent(user_agent).build()?,
+            ),
+        })
     }
 
     /// Authenticate a Modrinth client with a [Personal Access Token](https://modrinth.com/settings/pats) (PAT).
     pub fn pat(self, token: String) -> Modrinth<PAT> {
         Modrinth {
             state: PAT(token, None),
-            staging: self.staging,
             client: self.client,
         }
     }
@@ -86,7 +73,6 @@ impl Modrinth<Unauthenticated> {
 
         Ok(Modrinth {
             state: PAT(token, Some(expires_at)),
-            staging: self.staging,
             client: self.client,
         })
     }
