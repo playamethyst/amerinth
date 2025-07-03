@@ -2,6 +2,14 @@ use super::{Modrinth, auth::*};
 use crate::ModrinthError;
 use serde::de::DeserializeOwned;
 
+fn build_uri(staging: bool, endpoint: &str) -> String {
+    if staging {
+        format!("https://staging-api.modrinth.com/v2{}", endpoint)
+    } else {
+        format!("https://api.modrinth.com/v2{}", endpoint)
+    }
+}
+
 #[allow(async_fn_in_trait)]
 pub trait HttpClient {
     /// Send a GET request to the specified URL and deserialize the response into type `T`.
@@ -17,7 +25,7 @@ impl HttpClient for Modrinth<Unauthenticated> {
     {
         let response = self
             .client
-            .get(format!("https://api.modrinth.com/v2{}", endpoint))
+            .get(build_uri(self.staging, endpoint))
             .send()
             .await?;
         let json = response.json::<T>().await?;
@@ -36,7 +44,7 @@ impl<State: Authenticated> HttpClient for Modrinth<State> {
 
         let response = self
             .client
-            .get(format!("https://api.modrinth.com/v2{}", endpoint))
+            .get(build_uri(self.staging, endpoint))
             .header("Authorization", self.state.header())
             .send()
             .await?;

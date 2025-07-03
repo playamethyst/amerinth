@@ -1,11 +1,11 @@
 // todo:
 // - GET /updates/{id|slug}/forge_updates.json
 
-use serde::Deserialize;
 use crate::{
     Modrinth, ModrinthError,
     client::{AuthState, HttpClient},
 };
+use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]

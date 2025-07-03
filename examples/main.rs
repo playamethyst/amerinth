@@ -2,7 +2,7 @@ use amerinth::{Modrinth, UserAgent, misc};
 
 #[tokio::main]
 async fn main() -> Result<(), amerinth::ModrinthError> {
-    let auth = Modrinth::new(Some(
+    let auth = Modrinth::staging(Some(
         UserAgent::builder("amerinth/examples")
             .author("getamethyst")
             .version("0.0.0")
@@ -10,6 +10,7 @@ async fn main() -> Result<(), amerinth::ModrinthError> {
             .build(),
     ))?
     .pat_expires("h".to_string(), 31, 12, 2025)?;
+
     let statistics = misc::statistics(&auth).await;
     println!("{:?}", statistics);
 
