@@ -14,9 +14,9 @@ pub struct ForgeUpdates {
 #[derive(Debug, Deserialize)]
 pub struct Promo {
     /// The mod version that is recommended for {version}. Excludes versions with the alpha and beta version types.
-    recommended: String,
+    pub recommended: String,
     /// The latest mod version for {version}. Shows versions with the alpha and beta version types.
-    latest: String,
+    pub latest: String,
 }
 
 #[derive(Endpoint)]

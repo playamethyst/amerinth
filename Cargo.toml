@@ -3,6 +3,10 @@ name = "amerinth"
 version = "2.0.0"
 edition = "2024"
 
+[features]
+default = []
+misc = []
+
 [dependencies]
 bon = "3.6.4"
 reqwest = { version = "0.12.22", default-features = false, features = ["json", "rustls-tls"] }

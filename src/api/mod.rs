@@ -1,10 +1,2 @@
-// todo: endpoints
-// - projects
-// - versions
-// - version-files
-// - users
-// - notifications
-// - threads
-// - teams
-// - tags
+#[cfg(feature = "misc")]
 pub mod misc;

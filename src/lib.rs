@@ -1,14 +1,6 @@
 pub use api::misc;
 pub use client::{Modrinth, UserAgent};
 
-// todo: utils
-// - mrpack downloader
-// - curseforge -> modrinth
-
-// todo: blocking apis
-// todo: rate limits
-// todo: proper error handling
-
 mod api;
 mod client;
 
