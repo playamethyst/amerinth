@@ -18,3 +18,10 @@ pub use auth::{ModrinthAuth, UserAgent};
 // todo: blocking apis
 
 mod auth;
+
+/// An error that can occur when using the Modrinth API.
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error(transparent)]
+    Auth(#[from] auth::AuthError),
+}

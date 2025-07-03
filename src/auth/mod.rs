@@ -1,13 +1,27 @@
+use reqwest::Client;
 use time::{Date, Month, OffsetDateTime};
 pub use user_agent::UserAgent;
 
 mod user_agent;
 
-/// Represents an unauthenticated client for the Modrinth API.
-pub struct Unauthenticated;
+/// An error that can occur when authenticating with the Modrinth API.
+#[derive(Debug, thiserror::Error)]
+pub enum AuthError {
+    #[error("Failed to build HTTP client: {0}")]
+    HttpBuild(#[from] reqwest::Error),
+    #[error("Invalid date provided for expiration: {0}")]
+    InvalidDate(#[from] time::error::ComponentRange),
+}
 
-/// Trait representing an authenticated client for the Modrinth API.
-trait Authenticated {
+/// An authentication state for the Modrinth API.
+pub trait AuthState {}
+
+/// The unauthenticated state of the Modrinth client.
+pub struct Unauthenticated;
+impl AuthState for Unauthenticated {}
+
+/// Generic trait for authenticated states in the Modrinth API.
+trait Authenticated: AuthState {
     /// Get the authorization header.
     fn header(&self) -> String;
 
@@ -15,13 +29,13 @@ trait Authenticated {
     fn is_valid(&self) -> bool;
 }
 
-/// Represents a client authenticated with a Personal Access Token (PAT).
-#[derive(Debug)]
+/// Authentication using a [Personal Access Token](https://modrinth.com/settings/pats).
 pub struct PAT(String, Option<OffsetDateTime>);
+impl AuthState for PAT {}
 
 impl Authenticated for PAT {
     fn header(&self) -> String {
-        format!("Bearer {}", self.0)
+        self.0.clone()
     }
 
     fn is_valid(&self) -> bool {
@@ -37,10 +51,9 @@ impl Authenticated for PAT {
 // todo: OAuth
 
 /// Authentication for the Modrinth API.
-#[derive(Debug)]
-pub struct ModrinthAuth<State> {
+pub struct ModrinthAuth<State: AuthState> {
     state: State,
-    user_agent: String,
+    client: Client,
 }
 
 impl ModrinthAuth<Unauthenticated> {
@@ -51,7 +64,7 @@ impl ModrinthAuth<Unauthenticated> {
     /// and let the Modrinth team contact you if necessary. While it is not required
     /// in the context of this library, it is highly recommended to provide a user agent.
     /// If one is not provided, a default user agent identifying `amerinth` will be used.
-    pub fn new(user_agent: Option<UserAgent>) -> ModrinthAuth<Unauthenticated> {
+    pub fn new(user_agent: Option<UserAgent>) -> Result<ModrinthAuth<Unauthenticated>, AuthError> {
         let user_agent = user_agent
             .unwrap_or({
                 UserAgent::builder(env!("CARGO_PKG_NAME"))
@@ -62,33 +75,37 @@ impl ModrinthAuth<Unauthenticated> {
             })
             .to_string();
 
-        ModrinthAuth {
+        Ok(ModrinthAuth {
             state: Unauthenticated,
-            user_agent,
-        }
+            client: Client::builder().user_agent(user_agent).build()?,
+        })
     }
 
+    /// Authenticate a Modrinth client with a [Personal Access Token](https://modrinth.com/settings/pats) (PAT).
     pub fn pat(self, token: String) -> ModrinthAuth<PAT> {
         ModrinthAuth {
             state: PAT(token, None),
-            user_agent: self.user_agent,
+            client: self.client,
         }
     }
 
+    /// Authenticate a Modrinth client with a [Personal Access Token](https://modrinth.com/settings/pats) (PAT)
+    /// that expires on a specific date.
     pub fn pat_expires(
         self,
         token: String,
         day: u8,
         month: u8,
         year: i32,
-    ) -> Result<ModrinthAuth<PAT>, time::error::ComponentRange> {
+    ) -> Result<ModrinthAuth<PAT>, AuthError> {
+        // figure out the expiration date
         let month = Month::try_from(month)?;
         let date = Date::from_calendar_date(year, month, day)?;
         let expires_at = date.with_hms(23, 59, 59)?.assume_utc();
 
         Ok(ModrinthAuth {
             state: PAT(token, Some(expires_at)),
-            user_agent: self.user_agent,
+            client: self.client,
         })
     }
 }
