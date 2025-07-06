@@ -1,4 +1,4 @@
-pub use api::{misc, users};
+pub use api::{misc, tags, users};
 pub use client::{Modrinth, UserAgent};
 
 mod api;

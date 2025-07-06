@@ -1,4 +1,4 @@
-use amerinth::{Modrinth, UserAgent, users};
+use amerinth::{Modrinth, UserAgent, tags};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -16,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )?
     .pat(std::env::var("PAT")?, 31, 7, 2025)?;
 
-    let payload = users::get_many(&auth, vec!["newty", "abstralexis"]).await?;
+    let payload = tags::game_versions(&auth).await?;
     println!("{:?}", payload);
 
     Ok(())

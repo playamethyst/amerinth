@@ -30,7 +30,7 @@ pub struct User {
     pub role: UserRole,
     /// Any badges applicable to this user.
     /// These are currently unused and undisplayed, and as such are subject to change.
-    pub badges: BadgeList,
+    pub badges: Badges,
     /// A list of authentication providers you have signed up for (only displayed if requesting your own account)
     pub auth_providers: Option<Vec<AuthProviders>>,
     /// Whether your email is verified (only displayed if requesting your own account)
