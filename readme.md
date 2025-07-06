@@ -109,7 +109,7 @@
     - [x] **GET** `/tag/game_version`
     - [x] **GET** `/tag/license/{id}`
     - [x] **GET** `/tag/donation_platform`
-    - [ ] **GET** `/tag/report_type`
+    - [x] **GET** `/tag/report_type`
     - [ ] **GET** `/tag/project_type`
     - [ ] **GET** `/tag/slide_type`
 - [x] misc

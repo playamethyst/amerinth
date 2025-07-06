@@ -3,6 +3,7 @@ use crate::projects::ProjectType;
 
 use_all!(pub license);
 use_all!(pub loader);
+use_all!(pub report);
 
 macro_rules! tag {
     (@ $key_ty:ty, $key:expr, $val_ty:ty, $val_key:expr) => {
