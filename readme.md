@@ -4,6 +4,7 @@
 
 ### features
 
+- auto generate tag enums
 - rate limiting
 - blocking api
 - oauth

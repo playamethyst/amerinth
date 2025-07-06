@@ -1,5 +1,4 @@
-mod data;
-pub use data::*;
+use crate::helpers::use_all;
 
-mod get;
-pub use get::*;
+use_all!(pub data);
+use_all!(pub get);

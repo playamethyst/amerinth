@@ -1,14 +1,13 @@
-use crate::ModrinthError;
-use auth::*;
+use crate::{ModrinthError, helpers::use_all};
 pub use auth::{AuthMiddleware, AuthState, Authenticated};
 use chrono::{NaiveDate, TimeZone, Utc};
 use rustify::{clients::reqwest::Client, errors::ClientError};
 pub use user_agent::UserAgent;
 
-mod auth;
+use_all!(auth);
 mod user_agent;
 
-/// Authentication for the Modrinth API
+/// A client for the Modrinth API.
 pub struct Modrinth<Auth>
 where
     Auth: AuthState,
@@ -75,5 +74,15 @@ impl Modrinth<Unauthenticated> {
             auth: Pat(token, expires_at),
             client: self.client,
         })
+    }
+}
+
+impl<Auth: Authenticated> Modrinth<Auth> {
+    /// Log out of the Modrinth API, returning to an unauthenticated state.
+    pub fn logout(self) -> Modrinth<Unauthenticated> {
+        Modrinth {
+            auth: Unauthenticated,
+            client: self.client,
+        }
     }
 }

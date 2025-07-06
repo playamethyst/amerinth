@@ -1,18 +1,13 @@
 use crate::helpers::enum_vec;
-
-const ALL_BADGES: [Badge; 6] = [
-    Badge::EarlyModpackAdopter,
-    Badge::EarlyRespackAdopter,
-    Badge::EarlyPluginAdopter,
-    Badge::AlphaTester,
-    Badge::Contributor,
-    Badge::Translator,
-];
+use strum::{EnumIter, IntoEnumIterator};
 
 enum_vec! {
-    /// A Modrinth user badge.
+    /// A badge that a user can have on Modrinth.
+    ///
+    /// Badges are awarded for various contributions to the Modrinth community.
+    /// These are currently unused and undisplayed, and as such are subject to change.
     #[repr(u8)]
-    #[derive(Clone, Copy, PartialEq, Eq)]
+    #[derive(Copy, PartialEq, EnumIter, Eq)]
     enum Badge {
         // unused 0b0000_0000;
         EarlyModpackAdopter = 0b0000_0010,
@@ -23,7 +18,6 @@ enum_vec! {
         Translator = 0b0100_0000,
         // unused 0b0000_0000;
     }
-    vec_derive(Clone)
 }
 
 impl<'de> serde::Deserialize<'de> for Badges {
@@ -34,7 +28,7 @@ impl<'de> serde::Deserialize<'de> for Badges {
         let bitfield = u8::deserialize(deserializer)?;
         let mut badges = Vec::with_capacity(6);
 
-        for badge in ALL_BADGES {
+        for badge in Badge::iter() {
             if bitfield & (badge as u8) != 0 {
                 badges.push(badge);
             }

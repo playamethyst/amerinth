@@ -1,36 +1,31 @@
-use crate::helpers::enum_vec;
+use crate::helpers::{deserialize_other, enum_vec};
 use serde::{Deserialize, Deserializer};
+use strum::EnumString;
 
 enum_vec! {
-    /// A modrinth project type.
+    /// Types of projects that can be found on Modrinth.
+    #[derive(EnumString)]
+    #[strum(serialize_all = "lowercase")]
     enum ProjectType {
+        /// A mod is a modification to the game that adds new features, mechanics, or content.
         Mod,
+        /// A modpack is a curated collection of mods that are designed to work together.
         ModPack,
+        /// A resource pack is a collection of assets that change the game's visuals or sounds.
         ResourcePack,
+        /// A shader is a special type of resource pack that enhances the game's graphics with advanced visual effects.
         Shader,
+        /// A plugin is a server-side modification that adds new features or functionality to the game.
         Plugin,
+        /// A data pack is a collection of data-driven content that modifies or adds to the game's mechanics.
         DataPack,
+        /// An unknown project type, represented by a string.
+        #[strum(disabled)]
         Other(String),
     }
 }
 
-impl<'de> Deserialize<'de> for ProjectType {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        Ok(match s.as_str() {
-            "mod" => ProjectType::Mod,
-            "modpack" => ProjectType::ModPack,
-            "resourcepack" => ProjectType::ResourcePack,
-            "shader" => ProjectType::Shader,
-            "plugin" => ProjectType::Plugin,
-            "datapack" => ProjectType::DataPack,
-            unknown => ProjectType::Other(unknown.to_string()),
-        })
-    }
-}
+deserialize_other!(ProjectType);
 
 impl<'de> Deserialize<'de> for ProjectTypes {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>

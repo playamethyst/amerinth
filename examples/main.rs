@@ -14,9 +14,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .build(),
         ),
     )?
-    .pat(std::env::var("PAT")?, 31, 7, 2025)?;
+    .pat(std::env::var("PAT")?, 31, 7, 2025)?
+    .logout();
 
-    let payload = tags::game_versions(&auth).await?;
+    let payload = tags::loaders(&auth).await?;
     println!("{:?}", payload);
 
     Ok(())

@@ -1,8 +1,10 @@
-pub use api::{misc, tags, users};
+use crate::helpers::use_all;
+
+use_all!(pub api);
+
+mod client;
 pub use client::{Modrinth, UserAgent};
 
-mod api;
-mod client;
 mod helpers;
 
 /// An error that can occur when using the Modrinth API.
@@ -27,20 +29,10 @@ pub enum ModrinthError {
 #[allow(unused_imports)]
 pub(crate) mod prelude {
     pub(crate) use crate::client::{AuthState, Authenticated, Modrinth};
-    pub(crate) use crate::{ModrinthError as Error, helpers::*};
+    pub(crate) use crate::{ModrinthError, helpers::*};
+    pub(crate) use chrono::{DateTime, Utc};
     pub(crate) use rustify::Endpoint;
     pub(crate) use rustify::errors::ClientError;
     pub(crate) use rustify_derive::Endpoint;
     pub(crate) use serde::Deserialize;
-
-    /// Execute an endpoint
-    macro_rules! exec {
-        ($endpoint:expr, $modrinth:expr) => {
-            $endpoint
-                .with_middleware(&$crate::client::AuthMiddleware($modrinth))
-                .exec(&$modrinth.client)
-                .await
-        };
-    }
-    pub(crate) use exec;
 }

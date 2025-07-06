@@ -3,10 +3,10 @@ use chrono::{DateTime, Utc};
 use http::{HeaderValue, Request, Response};
 use rustify::{Endpoint, errors::ClientError};
 
-/// A client authentication state.
+/// The authentication state of the client.
 pub trait AuthState: Send + Sync {
-    /// Apply authentication to a request if applicable.
-    fn apply_auth<E: Endpoint>(
+    /// Authenticate a request if applicable.
+    fn auth<E: Endpoint>(
         &self,
         endpoint: &E,
         req: &mut Request<Vec<u8>>,
@@ -16,27 +16,27 @@ pub trait AuthState: Send + Sync {
 
 /// The client is unauthenticated.
 pub struct Unauthenticated;
+/// The client is authenticated.
+pub trait Authenticated: AuthState {}
 
 impl AuthState for Unauthenticated {
-    fn apply_auth<E: Endpoint>(
+    fn auth<E: Endpoint>(
         &self,
         _: &E,
         _: &mut Request<Vec<u8>>,
         _: &str,
     ) -> Result<(), ClientError> {
+        // unauthenticated clients do not need to do anything
         Ok(())
     }
 }
 
-/// Shared functionality between authenticated clients.
-pub trait Authenticated: AuthState {}
-
-/// The client is authenticated using a [Personal Access Token](https://modrinth.com/settings/pats).
+/// The client is [Authenticated] using a [Personal Access Token](https://modrinth.com/settings/pats).
 pub struct Pat(pub(crate) String, pub(crate) DateTime<Utc>);
 impl Authenticated for Pat {}
 
 impl AuthState for Pat {
-    fn apply_auth<E: Endpoint>(
+    fn auth<E: Endpoint>(
         &self,
         endpoint: &E,
         req: &mut Request<Vec<u8>>,
@@ -70,7 +70,7 @@ impl<Auth: AuthState> rustify::MiddleWare for AuthMiddleware<'_, Auth> {
         endpoint: &E,
         req: &mut Request<Vec<u8>>,
     ) -> Result<(), ClientError> {
-        self.0.auth.apply_auth(endpoint, req, &self.0.client.base)
+        self.0.auth.auth(endpoint, req, &self.0.client.base)
     }
 
     fn response<E: Endpoint>(&self, _: &E, _: &mut Response<Vec<u8>>) -> Result<(), ClientError> {

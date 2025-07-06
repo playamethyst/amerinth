@@ -1,61 +1,87 @@
-use std::collections::HashMap;
-
 use super::User;
 use crate::prelude::*;
+use std::{collections::HashMap, hash::Hash};
 
-#[derive(Endpoint)]
-#[endpoint(method = "GET", path = "v2/user/{self.user}", response = "User")]
-struct GetUser {
-    #[endpoint(skip)]
-    user: String,
-}
-
-/// ### GET `/user/{id|username}`
-/// Get a user
+/// ### Get a user
+/// Get a user by their username or ID.
+///
+/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/getuser/) for more details.
+///
+/// ### Arguments
+///
+/// - `user` - The username or ID of the user
+///
+/// ### Errors
+///
+/// Returns [ModrinthError::NotFound] if the user does not exist.
 pub async fn get<Auth: Authenticated>(
     modrinth: &Modrinth<Auth>,
     user: impl Into<String>,
-) -> Result<User> {
+) -> Result<User, ModrinthError> {
+    #[derive(Endpoint)]
+    #[endpoint(method = "GET", path = "v2/user/{self.user}", response = "User")]
+    struct GetUser {
+        #[endpoint(skip)]
+        user: String,
+    }
+
     let user = user.into();
     match exec!(GetUser { user: user.clone() }, modrinth) {
         Ok(res) => Ok(res.parse()?),
-        Err(_) => Err(Error::NotFound {
+        Err(_) => Err(ModrinthError::NotFound {
             resource: "user",
             id: user,
         }),
     }
 }
 
-#[derive(Endpoint)]
-#[endpoint(method = "GET", path = "v2/user", response = "User")]
-struct GetCurrentUser;
+/// ### Get user from authorization header
+///
+/// Gets the currently authenticated user.
+///
+/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/getuserfromauth/) for more details.
+///
+/// ### Errors
+///
+/// Returns [ModrinthError::Unauthorized] if the user is not authenticated.
+pub async fn current<Auth: Authenticated>(
+    modrinth: &Modrinth<Auth>,
+) -> Result<User, ModrinthError> {
+    #[derive(Endpoint)]
+    #[endpoint(method = "GET", path = "v2/user", response = "User")]
+    struct GetCurrentUser;
 
-/// ### GET `/user`
-/// Get user from authorization header
-pub async fn current<Auth: Authenticated>(modrinth: &Modrinth<Auth>) -> Result<User> {
-    match exec!(GetCurrentUser, modrinth) {
-        Ok(res) => Ok(res.parse()?),
-        Err(_) => Err(Error::Unauthorized),
-    }
+    Ok(exec!(GetCurrentUser, modrinth)?.parse()?)
 }
 
-#[derive(Endpoint)]
-#[endpoint(method = "GET", path = "v2/users", response = "Vec<User>")]
-struct GetUsers {
-    #[endpoint(query)]
-    ids: EndpointVec<String>,
-}
-
-/// GET `/users`
-/// Get multiple users
-pub async fn get_many<Auth, T>(
+/// ### Get multiple users
+///
+/// Get multiple users by their usernames or IDs.
+///
+/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/getusers/) for more details.
+///
+/// ### Arguments
+///
+/// - `users` - A [Vec] of usernames or IDs of the users
+///
+/// ### Errors
+///
+/// Returns [ModrinthError::NotFound] if any of the users do not exist.
+pub async fn many<Auth, T>(
     modrinth: &Modrinth<Auth>,
     users: Vec<T>,
-) -> Result<HashMap<T, Option<User>>>
+) -> Result<HashMap<T, Option<User>>, ModrinthError>
 where
     Auth: AuthState,
-    T: Clone + std::hash::Hash + Into<String> + PartialEq + Eq,
+    T: Clone + Hash + Into<String> + PartialEq + Eq,
 {
+    #[derive(Endpoint)]
+    #[endpoint(method = "GET", path = "v2/users", response = "Vec<User>")]
+    struct GetUsers {
+        #[endpoint(query)]
+        ids: EndpointVec<String>,
+    }
+
     let resolved: Vec<User> = exec!(
         GetUsers {
             ids: users.clone().into_iter().map(|u| u.into()).collect(),

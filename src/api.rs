@@ -1,21 +1,22 @@
 pub mod projects {
+    use crate::helpers::use_all;
+
     #[cfg(any(feature = "projects", feature = "tags"))]
-    mod project_type;
-    #[cfg(any(feature = "projects", feature = "tags"))]
-    pub use project_type::*;
+    use_all!(pub project_type);
 }
 
 #[cfg(feature = "users")]
 pub mod users;
 
+/// Tags are common and reusable lists of metadata types such as categories or versions.
 #[cfg(feature = "tags")]
 pub mod tags;
 
+/// Miscellaneous endpoints.
 #[cfg(feature = "misc")]
 pub mod misc {
-    mod forge;
-    pub use forge::*;
+    use crate::helpers::use_all;
 
-    mod statistics;
-    pub use statistics::*;
+    use_all!(pub forge);
+    use_all!(pub statistics);
 }

@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 /// Various statistics about this Modrinth instance.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Statistics {
     /// Number of projects on Modrinth
     pub projects: usize,
@@ -13,12 +13,17 @@ pub struct Statistics {
     pub authors: usize,
 }
 
-#[derive(Endpoint)]
-#[endpoint(method = "GET", path = "v2/statistics", response = "Statistics")]
-struct GetStatistics;
+/// ### Various statistics about this Modrinth instance
+///
+/// Get the number of projects, versions, version files, and authors on this Modrinth instance.
+///
+/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/statistics/) for more details.
+pub async fn statistics<Auth: AuthState>(
+    modrinth: &Modrinth<Auth>,
+) -> Result<Statistics, ModrinthError> {
+    #[derive(Endpoint)]
+    #[endpoint(method = "GET", path = "v2/statistics", response = "Statistics")]
+    struct GetStatistics;
 
-/// ### GET `/statistics`
-/// Get various statistics about this Modrinth instance.
-pub async fn statistics<Auth: AuthState>(modrinth: &Modrinth<Auth>) -> Result<Statistics> {
     Ok(exec!(GetStatistics, modrinth)?.parse()?)
 }

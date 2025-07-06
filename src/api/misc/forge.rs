@@ -1,8 +1,8 @@
 use crate::prelude::*;
 use std::collections::HashMap;
 
-/// Mod version information that can be consumed by Forge's update checker
-#[derive(Debug, Deserialize)]
+/// Mod version information that can be consumed by Forge's update checker.
+#[derive(Debug, Clone, Deserialize)]
 pub struct ForgeUpdates {
     /// A link to the mod page
     pub homepage: String,
@@ -10,8 +10,8 @@ pub struct ForgeUpdates {
     pub promos: HashMap<String, Promo>,
 }
 
-/// The recommended and latest versions for a Minecraft release
-#[derive(Debug, Deserialize)]
+/// The recommended and latest versions for a Minecraft release.
+#[derive(Debug, Clone, Deserialize)]
 pub struct Promo {
     /// The mod version that is recommended for {version}. Excludes versions with the alpha and beta version types.
     pub recommended: String,
@@ -19,23 +19,35 @@ pub struct Promo {
     pub latest: String,
 }
 
-#[derive(Endpoint)]
-#[endpoint(
-    method = "GET",
-    path = "updates/{self.project}/forge_updates.json",
-    response = "ForgeUpdates"
-)]
-pub struct GetForgeUpdates {
-    #[endpoint(skip)]
-    project: String,
-}
-
-/// ### GET `/updates/{id|slug}/forge_updates.json`
-/// Forge Updates JSON file
+/// ### Forge Updates JSON file
+///
+/// Get mod version information in the format consumed by Forge's update checker.
+/// This includes the recommended and latest versions for each Minecraft release.
+///
+/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/forgeupdates/) for more details.
+///
+/// ### Arguments
+///
+/// - `project` - The ID or slug of the project
+///
+/// ### Errors
+///
+/// Returns [ModrinthError::NotFound] if the project does not exist.///
 pub async fn forge<Auth: AuthState>(
     modrinth: &Modrinth<Auth>,
     project: impl Into<String>,
-) -> Result<ForgeUpdates> {
+) -> Result<ForgeUpdates, ModrinthError> {
+    #[derive(Endpoint)]
+    #[endpoint(
+        method = "GET",
+        path = "updates/{self.project}/forge_updates.json",
+        response = "ForgeUpdates"
+    )]
+    struct GetForgeUpdates {
+        #[endpoint(skip)]
+        project: String,
+    }
+
     let project = project.into();
     match exec!(
         GetForgeUpdates {
@@ -44,7 +56,7 @@ pub async fn forge<Auth: AuthState>(
         modrinth
     ) {
         Ok(res) => Ok(res.parse()?),
-        Err(_) => Err(Error::NotFound {
+        Err(_) => Err(ModrinthError::NotFound {
             resource: "project",
             id: project,
         }),

@@ -10,10 +10,9 @@ macro_rules! enum_vec {
                 ))? $(= $value:expr)?,
             )*
         }
-        $(vec_derive($($wrapper_derive:meta),*))?
     ) => {
         $(#[$meta])*
-        #[derive(Debug)]
+        #[derive(Debug, Clone)]
         pub enum $name {
             $(
                 $(#[$var_meta])*
@@ -24,7 +23,7 @@ macro_rules! enum_vec {
         }
 
         pastey::paste! {
-            $(#[derive($($wrapper_derive),*)])*
+            #[derive(Clone)]
             pub struct [<$name s>](Vec<$name>);
 
             impl std::ops::Deref for [<$name s>] {

@@ -1,12 +1,11 @@
+use crate::helpers::use_all;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
-mod badges;
-pub use badges::*;
+use_all!(pub badges);
+use_all!(pub payout);
 
-mod payout;
-pub use payout::*;
-
+/// A user on Modrinth.
 #[derive(Debug, Clone, Deserialize)]
 pub struct User {
     /// The user's username
@@ -42,14 +41,19 @@ pub struct User {
     // ! don't even include github_id because it has been deprecated
 }
 
-#[derive(Debug, Clone, Copy, Deserialize, PartialEq, Eq)]
+/// Roles that a user can have on Modrinth.
+///
+/// - Users can create projects, join teams, access notifications, manage settings, and follow projects.
+/// - Admins and moderators have more advanced permissions such as reviewing new projects.
+#[derive(Debug, Clone, Copy, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "lowercase")]
 pub enum UserRole {
-    Admin,
-    Moderator,
     Developer,
+    Moderator,
+    Admin,
 }
 
+/// Authentication providers that a user can use to sign up for Modrinth.
 // see: https://github.com/modrinth/code/blob/bff26af4655587ebb619dfde477356cc6ca5bd4b/apps/labrinth/src/auth/mod.rs#L113
 #[derive(Debug, Clone, Copy, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
