@@ -30,30 +30,23 @@ pub struct GetForgeUpdates {
     query: String,
 }
 
-#[derive(Debug, Error)]
-pub enum ForgeUpdatesError {
-    /// The Forge updates file for the given project does not exist.
-    #[error(r#"Project "{0}" does not exist."#)]
-    DoesNotExist(String),
-    #[error(transparent)]
-    Client(#[from] ClientError),
-}
-
 /// ### GET `/updates/{id|slug}/forge_updates.json`
 /// Forge Updates JSON file
-pub async fn forge<State>(
-    modrinth: &Modrinth<State>,
+pub async fn forge<Auth: AuthState>(
+    modrinth: &Modrinth<Auth>,
     query: impl Into<String>,
-) -> Result<ForgeUpdates, ForgeUpdatesError>
-where
-    State: AuthState,
-{
+) -> Result<ForgeUpdates> {
     let query = query.into();
-    let req = GetForgeUpdates {
-        query: query.clone(),
-    };
-    match req.exec(&modrinth.client).await {
+    match exec!(
+        GetForgeUpdates {
+            query: query.clone(),
+        },
+        modrinth
+    ) {
         Ok(res) => Ok(res.parse()?),
-        Err(_) => Err(ForgeUpdatesError::DoesNotExist(query)),
+        Err(_) => Err(Error::NotFound {
+            resource: "project",
+            id: query,
+        }),
     }
 }

@@ -65,10 +65,10 @@ impl Modrinth<Unauthenticated> {
     ) -> Result<Modrinth<Pat>, ModrinthError> {
         // encode the expiration date
         let date = NaiveDate::from_ymd_opt(year, month as u32, day as u32)
-            .ok_or_else(|| ModrinthError::InvalidDate(day, month, year))?;
+            .ok_or_else(|| ModrinthError::Expiration(day, month, year))?;
         let expires_at = date
             .and_hms_opt(23, 59, 59)
-            .ok_or_else(|| ModrinthError::InvalidDate(day, month, year))?;
+            .ok_or_else(|| ModrinthError::Expiration(day, month, year))?;
         let expires_at = Utc.from_utc_datetime(&expires_at);
 
         Ok(Modrinth {

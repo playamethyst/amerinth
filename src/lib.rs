@@ -7,20 +7,41 @@ mod client;
 /// An error that can occur when using the Modrinth API.
 #[derive(Debug, thiserror::Error)]
 pub enum ModrinthError {
-    #[error("Invalid date provided for expiration: {0}/{1}/{2}")]
-    InvalidDate(u8, u8, i32),
-    #[error("Token is invalid or expired")]
-    InvalidToken,
-    #[error("Failed to parse response: {0}")]
-    ClientError(#[from] rustify::errors::ClientError),
+    /// Resource not found.
+    #[error(r#"Resource not found: {resource} "{id}""#)]
+    NotFound { resource: &'static str, id: String },
+
+    /// Client is unauthorized.
+    #[error(r#"Unauthorized"#)]
+    Unauthorized,
+
+    /// Invalid expiration date.
+    #[error(r#"Invalid expiration date: {0}/{1}/{2}"#)]
+    Expiration(u8, u8, i32),
+
+    #[error("Client error: {0}")]
+    Client(#[from] rustify::errors::ClientError),
 }
 
 #[allow(unused_imports)]
 pub(crate) mod prelude {
-    pub(crate) use crate::client::{AuthMiddleware, AuthState, Authenticated, Modrinth};
+    pub(crate) use crate::ModrinthError as Error;
+    pub(crate) use crate::client::{AuthState, Authenticated, Modrinth};
     pub(crate) use rustify::Endpoint;
     pub(crate) use rustify::errors::ClientError;
     pub(crate) use rustify_derive::Endpoint;
     pub(crate) use serde::Deserialize;
-    pub(crate) use thiserror::Error;
+
+    pub(crate) type Result<T, E = Error> = std::result::Result<T, E>;
+
+    /// Execute an endpoint
+    macro_rules! exec {
+        ($endpoint:expr, $modrinth:expr) => {
+            $endpoint
+                .with_middleware(&$crate::client::AuthMiddleware($modrinth))
+                .exec(&$modrinth.client)
+                .await
+        };
+    }
+    pub(crate) use exec;
 }
