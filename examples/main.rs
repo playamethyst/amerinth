@@ -16,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )?
     .pat(std::env::var("PAT")?, 31, 7, 2025)?;
 
-    let payload = users::get(&auth, "abstralexis").await?;
+    let payload = users::get_many(&auth, vec!["newty", "abstralexis"]).await?;
     println!("{:?}", payload);
 
     Ok(())

@@ -20,6 +20,7 @@ const ALL_BADGES: [Badges; 6] = [
     Badges::Translator,
 ];
 
+#[derive(Clone)]
 pub struct BadgeList(Vec<Badges>);
 
 impl BadgeList {

@@ -19,8 +19,6 @@ struct GetStatistics;
 
 /// ### GET `/statistics`
 /// Get various statistics about this Modrinth instance.
-pub async fn statistics<Auth: AuthState>(
-    modrinth: &Modrinth<Auth>,
-) -> Result<Statistics, ClientError> {
-    exec!(GetStatistics, modrinth)?.parse()
+pub async fn statistics<Auth: AuthState>(modrinth: &Modrinth<Auth>) -> Result<Statistics> {
+    Ok(exec!(GetStatistics, modrinth)?.parse()?)
 }

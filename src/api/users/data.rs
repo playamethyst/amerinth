@@ -7,7 +7,7 @@ pub use badges::*;
 mod payout;
 pub use payout::*;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct User {
     /// The user's username
     pub username: String,

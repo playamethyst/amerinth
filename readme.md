@@ -62,14 +62,14 @@
         - [x] GET
         - [ ] PATCH
     - [x] GET `/user`
-    - [ ] GET `/users`
+    - [x] GET `/users`
     - [ ] `/user/{id|username}/icon`
         - [ ] DELETE
         - [ ] PATCH
     - [ ] GET `/user/{id|username}/projects`
     - [ ] GET `/user/{id|username}/follows`
-    - [ ] GET `/user/{id|username}/payouts`
-    - [ ] POST `/user/{id|username}/payouts`
+    <!-- - [ ] GET `/user/{id|username}/payouts`
+    - [ ] POST `/user/{id|username}/payouts` -->
 - [ ] notifications
     - [ ] GET `/user/{id|username}/notifications`
     - [ ] `/notification/{id}`

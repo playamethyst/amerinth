@@ -22,31 +22,31 @@ pub struct Promo {
 #[derive(Endpoint)]
 #[endpoint(
     method = "GET",
-    path = "updates/{self.query}/forge_updates.json",
+    path = "updates/{self.project}/forge_updates.json",
     response = "ForgeUpdates"
 )]
 pub struct GetForgeUpdates {
     #[endpoint(skip)]
-    query: String,
+    project: String,
 }
 
 /// ### GET `/updates/{id|slug}/forge_updates.json`
 /// Forge Updates JSON file
 pub async fn forge<Auth: AuthState>(
     modrinth: &Modrinth<Auth>,
-    query: impl Into<String>,
+    project: impl Into<String>,
 ) -> Result<ForgeUpdates> {
-    let query = query.into();
+    let project = project.into();
     match exec!(
         GetForgeUpdates {
-            query: query.clone(),
+            project: project.clone(),
         },
         modrinth
     ) {
         Ok(res) => Ok(res.parse()?),
         Err(_) => Err(Error::NotFound {
             resource: "project",
-            id: query,
+            id: project,
         }),
     }
 }

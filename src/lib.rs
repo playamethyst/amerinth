@@ -3,6 +3,7 @@ pub use client::{Modrinth, UserAgent};
 
 mod api;
 mod client;
+mod helpers;
 
 /// An error that can occur when using the Modrinth API.
 #[derive(Debug, thiserror::Error)]
@@ -25,14 +26,12 @@ pub enum ModrinthError {
 
 #[allow(unused_imports)]
 pub(crate) mod prelude {
-    pub(crate) use crate::ModrinthError as Error;
     pub(crate) use crate::client::{AuthState, Authenticated, Modrinth};
+    pub(crate) use crate::{ModrinthError as Error, helpers::*};
     pub(crate) use rustify::Endpoint;
     pub(crate) use rustify::errors::ClientError;
     pub(crate) use rustify_derive::Endpoint;
     pub(crate) use serde::Deserialize;
-
-    pub(crate) type Result<T, E = Error> = std::result::Result<T, E>;
 
     /// Execute an endpoint
     macro_rules! exec {

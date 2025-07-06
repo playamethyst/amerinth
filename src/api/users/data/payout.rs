@@ -19,7 +19,7 @@ pub enum PayoutWalletType {
 #[derive(Debug, Clone, Deserialize, PartialEq)]
 pub struct UserPayout {
     /// The payout balance available for the user to withdraw (note, you cannot modify this in a `PATCH` request)
-    pub balance: f32,
+    pub balance: f64,
     // ! these are undocumented in v2
     /// The user's PayPal email address, if they have one
     pub paypal_address: Option<String>,
