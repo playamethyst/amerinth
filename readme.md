@@ -107,8 +107,7 @@
     - [x] **GET** `/tag/category`
     - [x] **GET** `/tag/loader`
     - [x] **GET** `/tag/game_version`
-    - [ ] **GET** `/tag/license` (deprecated)
-    - [ ] **GET** `/tag/license/{id}`
+    - [x] **GET** `/tag/license/{id}`
     - [ ] **GET** `/tag/donation_platform`
     - [ ] **GET** `/tag/report_type`
     - [ ] **GET** `/tag/project_type`
@@ -123,3 +122,7 @@ these endpoints are documented but are actually private and not available to the
 
 - **GET** `/user/{id|username}/payouts`
 - **POST** `/user/{id|username}/payouts`
+
+these endpoints are deprecated, and will therefore not be supported.
+
+- **GET** `/tag/license`

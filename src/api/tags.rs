@@ -1,6 +1,7 @@
 use crate::prelude::*;
 use crate::projects::ProjectType;
 
+use_all!(pub license);
 use_all!(pub loader);
 
 macro_rules! tag {
