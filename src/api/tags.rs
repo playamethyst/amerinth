@@ -55,6 +55,7 @@ macro_rules! tag {
     (
         $(#[$fn_meta:meta])*
         $fn:ident, $tag:ident, ($key:expr => $key_ty:ty), $endpoint:expr;
+        $(#[$struct_meta:meta])*
         {
             $(
                 $(#[$field_meta:meta])*
@@ -63,6 +64,7 @@ macro_rules! tag {
         }
     ) => {
         pastey::paste! {
+            $(#[$struct_meta])*
             #[derive(Debug, Clone, serde::Deserialize)]
             pub struct [<$tag Info>] {
                 $(
@@ -85,10 +87,15 @@ pub(crate) use tag;
 #[derive(Debug, Clone, EnumString)]
 #[strum(serialize_all = "lowercase")]
 pub enum CategoryHeader {
+    /// Categories that are related to the project type.
     Categories,
+    /// Categories that are related to the features of the project.
     Features,
+    /// Categories that are related to the resolution(s) of textures in the project.
     Resolutions,
+    /// Categories that are related to the performance impact of the project.
     PerformanceImpact,
+    /// A custom or unknown header, represented by a string.
     Other(String),
 }
 deserialize_other!(CategoryHeader);
@@ -100,6 +107,7 @@ tag! {
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/categorylist/) for more details.
     categories, Category, ("name" => String), "v2/tag/category";
+    /// A category that can be applied to a project
     {
         /// The SVG icon of a category
         icon: String,
@@ -110,6 +118,7 @@ tag! {
     }
 }
 
+/// The type of release a game version is.
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "lowercase")]
 pub enum GameVersionType {
@@ -126,6 +135,7 @@ tag! {
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/versionlist/) for more details.
     game_versions, GameVersion, ("version" => String), "v2/tag/game_version";
+    /// A version of a game that a project can target.
     {
         /// The type of the game version
         version_type: GameVersionType,

@@ -4,16 +4,24 @@ use crate::prelude::*;
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum ReportType {
+    /// The project is spam or contains spam content.
     Spam,
+    /// The project violates copyright laws or contains copyrighted material without permission.
     Copyright,
+    /// The project is inappropriate or contains offensive content.
     Inappropriate,
+    /// The project is malicious or contains harmful content.
     Malicious,
+    /// The project is [cybersquatting](https://en.wikipedia.org/wiki/Cybersquatting) the name.
     #[serde(rename = "name-squatting")]
     NameSquatting,
+    /// The project has a poor description.
     #[serde(rename = "poor description")]
     PoorDescription,
+    /// The project has invalid metadata, such as missing or incorrect fields.
     #[serde(rename = "invalid metadata")]
     InvalidMetadata,
+    /// There is another issue with the project not covered by the other report types.
     Other,
 }
 

@@ -3,9 +3,10 @@ use std::fmt;
 use bon::Builder;
 
 /// Create a user agent optimised for the Modrinth API.
-/// You can view their guidelines for user agents [here](https://docs.modrinth.com/api/#user-agents).
 ///
 /// Try to fill out as many fields as possible to avoid having your traffic blocked.
+///
+/// You can view their guidelines for user agents [here](https://docs.modrinth.com/api/#user-agents).
 #[derive(Builder)]
 pub struct UserAgent<'a> {
     /// The name of the project, e.g. `amerinth`.
