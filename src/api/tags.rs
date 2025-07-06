@@ -145,3 +145,22 @@ tag! {
     donation_platforms, ("short" => String), "v2/tag/donation_platform";
     String ["name"]
 }
+
+/// ### Get a list of project types
+///
+/// Gets an array of valid project types.
+///
+/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/projecttypelist/) for more details.
+pub async fn project_types<Auth: AuthState>(
+    modrinth: &Modrinth<Auth>,
+) -> Result<Vec<ProjectType>, ModrinthError> {
+    #[derive(Endpoint)]
+    #[endpoint(
+        method = "GET",
+        path = "v2/tag/project_type",
+        response = "Vec<ProjectType>"
+    )]
+    struct GetProjectTypes;
+
+    Ok(exec!(GetProjectTypes, modrinth)?.parse()?)
+}

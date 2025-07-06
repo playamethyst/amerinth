@@ -31,7 +31,7 @@ pub async fn report_types<Auth: AuthState>(
         path = "v2/tag/report_type",
         response = "Vec<ReportType>"
     )]
-    struct Request;
+    struct GetReportTypes;
 
-    Ok(exec!(Request, modrinth)?.parse()?)
+    Ok(exec!(GetReportTypes, modrinth)?.parse()?)
 }
