@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .pat(std::env::var("PAT")?, 31, 7, 2025)?
     .logout();
 
-    let payload = tags::project_types(&auth).await?;
+    let payload = tags::side_types(&auth).await?;
     println!("{:?}", payload);
 
     Ok(())

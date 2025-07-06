@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 /// A report type supported by Modrinth.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum ReportType {
     Spam,

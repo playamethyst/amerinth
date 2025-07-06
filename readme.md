@@ -7,6 +7,7 @@
 - auto generate tag enums
 - rate limiting
 - blocking api
+- caching layer
 - oauth
 - tracing
 - utilities
@@ -103,15 +104,15 @@
         - [ ] **DELETE**
         - [ ] **PATCH**
     - [ ] **PATCH** `/team/{id}/owner`
-- [ ] tags
+- [x] tags
     - [x] **GET** `/tag/category`
     - [x] **GET** `/tag/loader`
     - [x] **GET** `/tag/game_version`
     - [x] **GET** `/tag/license/{id}`
     - [x] **GET** `/tag/donation_platform`
     - [x] **GET** `/tag/report_type`
-    - [ ] **GET** `/tag/project_type`
-    - [ ] **GET** `/tag/slide_type`
+    - [x] **GET** `/tag/project_type`
+    - [x] **GET** `/tag/side_type`
 - [x] misc
     - [x] **GET** `/updates/{id|slug}/forge_updates.json`
     - [x] **GET** `/statistics`

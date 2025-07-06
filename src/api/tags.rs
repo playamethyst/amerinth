@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use crate::projects::ProjectType;
+use crate::projects::{ProjectSide, ProjectType};
 
 use_all!(pub license);
 use_all!(pub loader);
@@ -163,4 +163,23 @@ pub async fn project_types<Auth: AuthState>(
     struct GetProjectTypes;
 
     Ok(exec!(GetProjectTypes, modrinth)?.parse()?)
+}
+
+/// ### Get a list of side types
+///
+/// Gets an array of valid side types.
+///
+/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/sidetypelist/) for more details.
+pub async fn side_types<Auth: AuthState>(
+    modrinth: &Modrinth<Auth>,
+) -> Result<Vec<ProjectSide>, ModrinthError> {
+    #[derive(Endpoint)]
+    #[endpoint(
+        method = "GET",
+        path = "v2/tag/side_type",
+        response = "Vec<ProjectSide>"
+    )]
+    struct GetSideTypes;
+
+    Ok(exec!(GetSideTypes, modrinth)?.parse()?)
 }

@@ -6,7 +6,6 @@ pub struct License {
     pub title: String,
     pub body: String,
 }
-use crate::Modrinth;
 
 /// ### Get the text and title of a license
 ///
