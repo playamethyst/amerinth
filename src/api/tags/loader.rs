@@ -2,6 +2,11 @@ use crate::prelude::*;
 use crate::projects::ProjectTypes;
 
 super::tag! {
+    /// ### Get a list of loaders
+    ///
+    /// Gets an array of loaders, their icons, and supported project types.
+    ///
+    /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/loaderlist/) for more details.
     loaders, Loader, ("name" => String), "v2/tag/loader";
     {
         /// The SVG icon of a loader
@@ -11,12 +16,6 @@ super::tag! {
         project_types: ProjectTypes,
     }
 }
-
-/// ### Get a list of loaders
-///
-/// Gets an array of loaders, their icons, and supported project types.
-///
-/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/loaderlist/) for more details.
 
 /// Represents the different types of mod loaders, plugin platforms, proxies,
 /// and other mechanisms used to modify or extend Minecraft.

@@ -5,6 +5,52 @@ use_all!(pub license);
 use_all!(pub loader);
 
 macro_rules! tag {
+    (@ $key_ty:ty, $key:expr, $val_ty:ty, $val_key:expr) => {
+        #[derive(serde::Deserialize)]
+        struct Response {
+            #[serde(rename = $key)]
+            key: $key_ty,
+            #[serde(rename = $val_key)]
+            data: $val_ty
+        }
+    };
+    (@ $key_ty:ty, $key:expr, $val_ty:ty) => {
+        #[derive(serde::Deserialize)]
+        struct Response {
+            #[serde(rename = $key)]
+            key: $key_ty,
+            #[serde(flatten)]
+            data: $val_ty
+        }
+    };
+    (
+        $(#[$fn_meta:meta])*
+        $fn:ident, ($key:expr => $key_ty:ty), $endpoint:expr;
+        $val_ty:ty $([$val_key:expr])?
+    ) => {
+        pastey::paste! {
+            $(#[$fn_meta])*
+            pub async fn $fn<Auth: $crate::client::AuthState>(
+                    modrinth: &$crate::Modrinth<Auth>
+            ) -> Result<std::collections::HashMap<$key_ty, $val_ty>, $crate::ModrinthError> {
+                use rustify::Endpoint;
+
+                $crate::tags::tag!(@ $key_ty, $key, $val_ty $(, $val_key)?);
+
+                #[derive(rustify_derive::Endpoint)]
+                #[endpoint(method = "GET", path = $endpoint, response = "Vec<Response>")]
+                struct Request;
+
+                let list: Vec<Response> = $crate::helpers::exec!(Request, modrinth)?.parse()?;
+
+                Ok(list
+                    .into_iter()
+                    .map(|item| (item.key, item.data))
+                    .collect()
+                )
+            }
+        }
+    };
     (
         $(#[$fn_meta:meta])*
         $fn:ident, $tag:ident, ($key:expr => $key_ty:ty), $endpoint:expr;
@@ -24,32 +70,11 @@ macro_rules! tag {
                 )*
             }
 
-            $(#[$fn_meta])*
-            pub async fn $fn<Auth: $crate::client::AuthState>(
-                    modrinth: &$crate::Modrinth<Auth>
-            ) -> Result<std::collections::HashMap<$key_ty, [<$tag Info>]>, $crate::ModrinthError> {
-                use rustify::Endpoint;
-
-                #[derive(serde::Deserialize)]
-                struct Response {
-                    #[serde(rename = $key)]
-                    key: $key_ty,
-                    #[serde(flatten)]
-                    data: [<$tag Info>],
-                }
-
-                #[derive(rustify_derive::Endpoint)]
-                #[endpoint(method = "GET", path = $endpoint, response = "Vec<Response>")]
-                struct Request;
-
-                let list: Vec<Response> = $crate::helpers::exec!(Request, modrinth)?.parse()?;
-
-                Ok(list
-                    .into_iter()
-                    .map(|item| (item.key, item.data))
-                    .collect()
-                )
-            }
+            $crate::tags::tag!(
+                $(#[$fn_meta])*
+                $fn, ($key => $key_ty), $endpoint;
+                [<$tag Info>]
+            );
         }
     };
 }
@@ -108,4 +133,14 @@ tag! {
         /// Whether or not this is a major version, used for Featured Versions
         major: bool,
     }
+}
+
+tag! {
+    /// ### Get a list of donation platforms
+    ///
+    /// Gets an array of donation platforms and information about them.
+    ///
+    /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/donationplatformlist/) for more details.
+    donation_platforms, ("short" => String), "v2/tag/donation_platform";
+    String ["name"]
 }

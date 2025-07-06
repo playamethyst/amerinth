@@ -13,6 +13,8 @@ use crate::Modrinth;
 /// Get the text and title of a license supported by Modrinth.
 /// Modrinth supports any license that is listed on the [SPDX License List](https://spdx.org/licenses/).
 ///
+/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/licensetext/) for more details.
+///
 /// ### Arguments
 ///
 /// - `license` - The SPDX ID of the license (e.g., "MIT", "LGPL-3.0-or-later")

@@ -108,7 +108,7 @@
     - [x] **GET** `/tag/loader`
     - [x] **GET** `/tag/game_version`
     - [x] **GET** `/tag/license/{id}`
-    - [ ] **GET** `/tag/donation_platform`
+    - [x] **GET** `/tag/donation_platform`
     - [ ] **GET** `/tag/report_type`
     - [ ] **GET** `/tag/project_type`
     - [ ] **GET** `/tag/slide_type`
