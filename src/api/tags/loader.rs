@@ -1,38 +1,22 @@
 use crate::prelude::*;
 use crate::projects::ProjectTypes;
-use std::collections::HashMap;
-use strum::EnumString;
+
+super::tag! {
+    loaders, Loader, ("name" => String), "v2/tag/loader";
+    {
+        /// The SVG icon of a loader
+        icon: String,
+        /// The project types that this loader is applicable to
+        #[serde(rename = "supported_project_types")]
+        project_types: ProjectTypes,
+    }
+}
 
 /// ### Get a list of loaders
 ///
 /// Gets an array of loaders, their icons, and supported project types.
 ///
 /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/loaderlist/) for more details.
-pub async fn loaders<Auth: AuthState>(
-    modrinth: &Modrinth<Auth>,
-) -> Result<HashMap<Loader, LoaderInfo>, ModrinthError> {
-    #[derive(Endpoint)]
-    #[endpoint(
-        method = "GET",
-        path = "v2/tag/loader",
-        response = "Vec<LoaderResponse>"
-    )]
-    struct GetLoaders;
-
-    #[derive(Deserialize)]
-    struct LoaderResponse {
-        name: Loader,
-        #[serde(flatten)]
-        info: LoaderInfo,
-    }
-
-    let res: Vec<LoaderResponse> = exec!(GetLoaders, modrinth)?.parse()?;
-
-    Ok(res
-        .into_iter()
-        .map(|loader| (loader.name, loader.info))
-        .collect())
-}
 
 /// Represents the different types of mod loaders, plugin platforms, proxies,
 /// and other mechanisms used to modify or extend Minecraft.
@@ -99,12 +83,3 @@ pub enum Loader {
 }
 
 deserialize_other!(Loader);
-
-#[derive(Debug, Deserialize)]
-pub struct LoaderInfo {
-    /// The SVG icon of a loader
-    icon: String,
-    /// The project types that this loader is applicable to
-    #[serde(rename = "supported_project_types")]
-    project_types: ProjectTypes,
-}

@@ -1,53 +1,70 @@
 use crate::prelude::*;
+use crate::projects::ProjectType;
 
 use_all!(pub loader);
 
 macro_rules! tag {
-    (@
-        $(#[$fn_meta:meta])*
-        $fn:ident, $response:expr, $endpoint:expr, $return:ty
-    ) => {
-        pastey::paste! {
-            $(#[$fn_meta])*
-            pub async fn $fn<Auth: $crate::client::AuthState>(modrinth: &$crate::Modrinth<Auth>) -> Result<Vec<$return>, $crate::ModrinthError> {
-                #[derive(rustify_derive::Endpoint)]
-                #[endpoint(method = "GET", path = $endpoint, response = $response)]
-                #[allow(non_camel_case_types)]
-                struct [<Get $fn>];
-
-                Ok($crate::helpers::exec!([<Get $fn>], modrinth)?.parse()?)
-            }
-        }
-    };
     (
         $(#[$fn_meta:meta])*
-        $fn:ident, $response:expr, $endpoint:expr, $return:ty
-    ) => {
-        tag!(@ $(#[$fn_meta])* $fn, $response, $endpoint, $return);
-    };
-    (
-        $(#[$fn_meta:meta])*
-        $fn:ident, $response:expr, $endpoint:expr,
-        $(#[$struct_meta:meta])*
-        struct $struct:ident {
+        $fn:ident, $tag:ident, ($key:expr => $key_ty:ty), $endpoint:expr;
+        {
             $(
                 $(#[$field_meta:meta])*
                 $field:ident: $type:ty
             ),* $(,)?
         }
     ) => {
-        $crate::tags::tag!(@ $(#[$fn_meta])* $fn, $response, $endpoint, $struct);
-        $(#[$struct_meta])*
-        #[derive(Debug, Clone, serde::Deserialize)]
-        pub struct $struct {
-            $(
-                $(#[$field_meta])*
-                pub $field: $type,
-            )*
+        pastey::paste! {
+            #[derive(Debug, Clone, serde::Deserialize)]
+            pub struct [<$tag Info>] {
+                $(
+                    $(#[$field_meta])*
+                    pub $field: $type,
+                )*
+            }
+
+            $(#[$fn_meta])*
+            pub async fn $fn<Auth: $crate::client::AuthState>(
+                    modrinth: &$crate::Modrinth<Auth>
+            ) -> Result<std::collections::HashMap<$key_ty, [<$tag Info>]>, $crate::ModrinthError> {
+                use rustify::Endpoint;
+
+                #[derive(serde::Deserialize)]
+                struct Response {
+                    #[serde(rename = $key)]
+                    key: $key_ty,
+                    #[serde(flatten)]
+                    data: [<$tag Info>],
+                }
+
+                #[derive(rustify_derive::Endpoint)]
+                #[endpoint(method = "GET", path = $endpoint, response = "Vec<Response>")]
+                struct Request;
+
+                let list: Vec<Response> = $crate::helpers::exec!(Request, modrinth)?.parse()?;
+
+                Ok(list
+                    .into_iter()
+                    .map(|item| (item.key, item.data))
+                    .collect()
+                )
+            }
         }
     };
 }
 pub(crate) use tag;
+
+/// Headers that categories can be grouped under.
+#[derive(Debug, Clone, EnumString)]
+#[strum(serialize_all = "lowercase")]
+pub enum CategoryHeader {
+    Categories,
+    Features,
+    Resolutions,
+    PerformanceImpact,
+    Other(String),
+}
+deserialize_other!(CategoryHeader);
 
 tag! {
     /// ### Get a list of categories
@@ -55,22 +72,17 @@ tag! {
     /// Gets an array of categories, their icons, and applicable project types.
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/categorylist/) for more details.
-    categories, "Vec<Category>", "v2/tag/category",
-
-    /// A category is a way to group projects together based on their type or purpose.
-    struct Category {
+    categories, Category, ("name" => String), "v2/tag/category";
+    {
         /// The SVG icon of a category
         icon: String,
-        /// The name of the category
-        name: String,
         /// The project type this category is applicable to
-        project_type: String,
+        project_type: ProjectType,
         /// The header under which the category should go
-        header: String,
+        header: CategoryHeader,
     }
 }
 
-/// The type of game version.
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "lowercase")]
 pub enum GameVersionType {
@@ -86,10 +98,8 @@ tag! {
     /// Gets an array of game versions and information about them.
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/versionlist/) for more details.
-    game_versions, "Vec<GameVersion>", "v2/tag/game_version",
-    struct GameVersion {
-        /// The name/number of the game version
-        version: String,
+    game_versions, GameVersion, ("version" => String), "v2/tag/game_version";
+    {
         /// The type of the game version
         version_type: GameVersionType,
         /// The date of the game version release

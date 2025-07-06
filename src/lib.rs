@@ -35,4 +35,5 @@ pub(crate) mod prelude {
     pub(crate) use rustify::errors::ClientError;
     pub(crate) use rustify_derive::Endpoint;
     pub(crate) use serde::Deserialize;
+    pub(crate) use strum::EnumString;
 }
