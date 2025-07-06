@@ -1,4 +1,4 @@
-use amerinth::{Modrinth, UserAgent, tags};
+use amerinth::{Modrinth, UserAgent, misc};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .pat(std::env::var("PAT")?, 31, 7, 2025)?
     .logout();
 
-    let payload = tags::side_types(&auth).await?;
+    let payload = misc::forge(&auth, "sodium").await?;
     println!("{:?}", payload);
 
     Ok(())

@@ -1,18 +1,22 @@
 use crate::{ModrinthError, helpers::use_all};
-pub use auth::{AuthMiddleware, AuthState, Authenticated};
+pub(crate) use auth::AuthMiddleware;
+pub use auth::{AuthState, Authenticated};
 use chrono::{NaiveDate, TimeZone, Utc};
-use rustify::{clients::reqwest::Client, errors::ClientError};
+#[cfg(not(feature = "blocking"))]
+use reqwest::Client as Reqwest;
+#[cfg(feature = "blocking")]
+use rustify::blocking::clients::reqwest::Client;
+#[cfg(not(feature = "blocking"))]
+use rustify::clients::reqwest::Client;
 pub use user_agent::UserAgent;
 
 use_all!(auth);
 mod user_agent;
 
 /// A client for the Modrinth API.
-pub struct Modrinth<Auth>
-where
-    Auth: AuthState,
-{
+pub struct Modrinth<Auth: AuthState> {
     auth: Auth,
+    user_agent: String,
     pub(crate) client: Client,
 }
 
@@ -40,17 +44,12 @@ impl Modrinth<Unauthenticated> {
 
         Ok(Modrinth {
             auth: Unauthenticated,
-            client: Client::new(
-                if staging {
-                    "https://staging-api.modrinth.com"
-                } else {
-                    "https://api.modrinth.com"
-                },
-                reqwest::Client::builder()
-                    .user_agent(user_agent)
-                    .build()
-                    .map_err(|source| ClientError::ReqwestBuildError { source })?,
-            ),
+            user_agent,
+            client: Client::default(if staging {
+                "https://staging-api.modrinth.com"
+            } else {
+                "https://api.modrinth.com"
+            }),
         })
     }
 
@@ -72,6 +71,7 @@ impl Modrinth<Unauthenticated> {
 
         Ok(Modrinth {
             auth: Pat(token, expires_at),
+            user_agent: self.user_agent,
             client: self.client,
         })
     }
@@ -82,6 +82,7 @@ impl<Auth: Authenticated> Modrinth<Auth> {
     pub fn logout(self) -> Modrinth<Unauthenticated> {
         Modrinth {
             auth: Unauthenticated,
+            user_agent: self.user_agent,
             client: self.client,
         }
     }

@@ -6,6 +6,7 @@ edition = "2024"
 
 [features]
 default = []
+blocking = ["rustify/blocking", "rustify/reqwest"]
 
 # modules
 all = ["projects", "versions", "version-files", "users", "notifications", "threads", "teams", "tags", "misc"]

@@ -19,42 +19,37 @@ pub struct Promo {
     pub latest: String,
 }
 
-/// ### Forge Updates JSON file
-///
-/// Get mod version information in the format consumed by Forge's update checker.
-/// This includes the recommended and latest versions for each Minecraft release.
-///
-/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/forgeupdates/) for more details.
-///
-/// ### Arguments
-///
-/// - `project` - The ID or slug of the project
-///
-/// ### Errors
-///
-/// Returns [ModrinthError::NotFound] if the project does not exist.///
-pub async fn forge<Auth: AuthState>(
-    modrinth: &Modrinth<Auth>,
-    project: impl Into<String>,
-) -> Result<ForgeUpdates, ModrinthError> {
-    #[derive(Endpoint)]
-    #[endpoint(
-        method = "GET",
-        path = "updates/{self.project}/forge_updates.json",
-        response = "ForgeUpdates"
-    )]
-    struct GetForgeUpdates {
-        #[endpoint(skip)]
-        project: String,
-    }
+#[derive(Endpoint)]
+#[endpoint(
+    method = "GET",
+    path = "updates/{self.project}/forge_updates.json",
+    response = "ForgeUpdates"
+)]
+struct GetForgeUpdates {
+    #[endpoint(skip)]
+    project: String,
+}
 
-    let project = project.into();
-    match exec!(
-        GetForgeUpdates {
-            project: project.clone(),
-        },
-        modrinth
-    ) {
+endpoint_fn! {
+    GetForgeUpdates {
+        project: project.clone()
+    };
+
+    /// ### Forge Updates JSON file
+    ///
+    /// Get mod version information in the format consumed by Forge's update checker.
+    /// This includes the recommended and latest versions for each Minecraft release.
+    ///
+    /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/forgeupdates/) for more details.
+    ///
+    /// ### Arguments
+    ///
+    /// - `project` - The ID or slug of the project
+    ///
+    /// ### Errors
+    ///
+    /// Returns [ModrinthError::NotFound] if the project does not exist.
+    fn forge(project: impl Into<String>) -> ForgeUpdates {
         Ok(res) => Ok(res.parse()?),
         Err(_) => Err(ModrinthError::NotFound {
             resource: "project",

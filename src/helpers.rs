@@ -1,19 +1,8 @@
-mod endpoint_vec;
-pub(crate) use endpoint_vec::*;
+mod endpoint;
+pub(crate) use endpoint::*;
 
 mod enum_vec;
 pub(crate) use enum_vec::*;
-
-/// Execute an endpoint
-macro_rules! exec {
-    ($endpoint:expr, $modrinth:expr) => {
-        $endpoint
-            .with_middleware(&$crate::client::AuthMiddleware($modrinth))
-            .exec(&$modrinth.client)
-            .await
-    };
-}
-pub(crate) use exec;
 
 /// A macro to use all items from a module.
 macro_rules! use_all {
