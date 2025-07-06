@@ -19,7 +19,7 @@ pub struct User {
     /// A description of the user
     pub bio: Option<String>,
     /// Various data relating to the user's payouts status (you can only see your own)
-    pub payout_data: UserPayout,
+    pub payout_data: Option<UserPayout>,
     /// The user’s ID
     pub id: String,
     /// The user’s avatar url
@@ -32,7 +32,7 @@ pub struct User {
     /// These are currently unused and undisplayed, and as such are subject to change.
     pub badges: BadgeList,
     /// A list of authentication providers you have signed up for (only displayed if requesting your own account)
-    pub auth_providers: Vec<AuthProviders>,
+    pub auth_providers: Option<Vec<AuthProviders>>,
     /// Whether your email is verified (only displayed if requesting your own account)
     pub email_verified: Option<bool>,
     /// Whether you have a password associated with your account (only displayed if requesting your own account)

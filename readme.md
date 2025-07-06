@@ -59,7 +59,7 @@
     - [ ] POST `/version_files/update` 
 - [ ] users
     - [ ] `/user/{id|username}`
-        - [ ] GET
+        - [x] GET
         - [ ] PATCH
     - [x] GET `/user`
     - [ ] GET `/users`

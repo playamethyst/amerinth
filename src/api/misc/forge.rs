@@ -1,4 +1,3 @@
-
 use crate::prelude::*;
 use std::collections::HashMap;
 
@@ -32,11 +31,12 @@ pub struct GetForgeUpdates {
 }
 
 #[derive(Debug, Error)]
-pub enum ForgeError {
+pub enum ForgeUpdatesError {
+    /// The Forge updates file for the given project does not exist.
     #[error(r#"Project "{0}" does not exist."#)]
     DoesNotExist(String),
     #[error(transparent)]
-    Other(#[from] ClientError),
+    Client(#[from] ClientError),
 }
 
 /// ### GET `/updates/{id|slug}/forge_updates.json`
@@ -44,7 +44,7 @@ pub enum ForgeError {
 pub async fn forge<State>(
     modrinth: &Modrinth<State>,
     query: impl Into<String>,
-) -> Result<ForgeUpdates, ForgeError>
+) -> Result<ForgeUpdates, ForgeUpdatesError>
 where
     State: AuthState,
 {
@@ -54,8 +54,6 @@ where
     };
     match req.exec(&modrinth.client).await {
         Ok(res) => Ok(res.parse()?),
-        // this endpoint only has one possible error - does not exist
-        // see: https://github.com/modrinth/code/blob/9dc56442644d8bd8ad2eb67f07cb2763b3a2fe30/apps/labrinth/src/routes/updates.rs#L41
-        Err(_) => Err(ForgeError::DoesNotExist(query)),
+        Err(_) => Err(ForgeUpdatesError::DoesNotExist(query)),
     }
 }
