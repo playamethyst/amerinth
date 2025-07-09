@@ -19,21 +19,22 @@ pub struct Promo {
     pub latest: String,
 }
 
-#[derive(Endpoint)]
-#[endpoint(
-    method = "GET",
-    path = "updates/{self.project}/forge_updates.json",
-    response = "ForgeUpdates"
-)]
-struct GetForgeUpdates {
-    #[endpoint(skip)]
-    project: String,
-}
+// #[derive(Endpoint)]
+// #[endpoint(
+//     method = "GET",
+//     path = "updates/{self.project}/forge_updates.json",
+//     response = "ForgeUpdates"
+// )]
+// struct GetForgeUpdates {
+//     #[endpoint(skip)]
+//     project: String,
+// }
 
-endpoint_fn! {
-    GetForgeUpdates {
-        project: project.clone()
-    };
+endpoint! {
+    "GET" "updates/{self.project}/forge_updates.json" {
+        #[endpoint(skip)]
+        project: String [project.into()]
+    } -> "ForgeUpdates";
 
     /// ### Forge Updates JSON file
     ///
@@ -49,11 +50,13 @@ endpoint_fn! {
     /// ### Errors
     ///
     /// Returns [ModrinthError::NotFound] if the project does not exist.
-    fn forge(project: impl Into<String>) -> ForgeUpdates {
-        Ok(res) => Ok(res.parse()?),
-        Err(_) => Err(ModrinthError::NotFound {
-            resource: "project",
-            id: project,
-        }),
+    fn forge(project: &str) -> ForgeUpdates {
+        |res| match res {
+            Ok(res) => Ok(res.parse()?),
+            Err(_) => Err(ModrinthError::NotFound {
+                resource: "project",
+                id: project.into()
+            })
+        }
     }
 }

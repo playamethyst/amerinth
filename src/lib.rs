@@ -24,6 +24,9 @@ pub enum ModrinthError {
 
     #[error("Client error: {0}")]
     Client(#[from] rustify::errors::ClientError),
+
+    #[error(transparent)]
+    Infalliable(#[from] std::convert::Infallible),
 }
 
 #[allow(unused_imports)]
@@ -33,7 +36,6 @@ pub(crate) mod prelude {
     pub(crate) use chrono::{DateTime, Utc};
     pub(crate) use rustify::Endpoint;
     pub(crate) use rustify::errors::ClientError;
-    pub(crate) use rustify_derive::Endpoint;
     pub(crate) use serde::Deserialize;
     pub(crate) use strum::EnumString;
 }

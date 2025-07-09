@@ -1,7 +1,6 @@
 use crate::Modrinth;
 use chrono::{DateTime, Utc};
 use http::{HeaderMap, HeaderValue, Request, Response};
-use reqwest::Client;
 use rustify::{Endpoint, enums::RequestMethod, errors::ClientError};
 
 /// The authentication state of the client.

@@ -4,6 +4,8 @@ alias c := clippy
 alias d := doc
 alias r := run
 
+default: run
+
 clippy:
     cargo clippy --features all,blocking --fix --allow-dirty
 

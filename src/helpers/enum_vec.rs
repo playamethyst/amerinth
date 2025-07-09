@@ -10,6 +10,11 @@ macro_rules! enum_vec {
                 ))? $(= $value:expr)?,
             )*
         }
+        $(
+            vec_meta(
+                $(#[$vec_meta:meta])*
+            )
+        )?
     ) => {
         $(#[$meta])*
         #[derive(Debug, Clone)]
@@ -23,6 +28,7 @@ macro_rules! enum_vec {
         }
 
         pastey::paste! {
+            $($(#[$vec_meta])*)?
             #[derive(Clone)]
             pub struct [<$name s>](Vec<$name>);
 

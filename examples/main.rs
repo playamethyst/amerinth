@@ -1,10 +1,9 @@
-use amerinth::{Modrinth, UserAgent, misc};
+use amerinth::{Modrinth, UserAgent, tags};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt().init();
-
-    let auth = Modrinth::new(
+    let client = Modrinth::new(
         false,
         Some(
             UserAgent::builder("amerinth/examples")
@@ -17,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .pat(std::env::var("PAT")?, 31, 7, 2025)?
     .logout();
 
-    let payload = misc::forge(&auth, "sodium").await?;
+    let payload = tags::game_versions(&client).await?;
     println!("{:?}", payload);
 
     Ok(())

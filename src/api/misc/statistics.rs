@@ -13,17 +13,13 @@ pub struct Statistics {
     pub authors: usize,
 }
 
-/// ### Various statistics about this Modrinth instance
-///
-/// Get the number of projects, versions, version files, and authors on this Modrinth instance.
-///
-/// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/statistics/) for more details.
-pub async fn statistics<Auth: AuthState>(
-    modrinth: &Modrinth<Auth>,
-) -> Result<Statistics, ModrinthError> {
-    #[derive(Endpoint)]
-    #[endpoint(method = "GET", path = "v2/statistics", response = "Statistics")]
-    struct GetStatistics;
+endpoint! {
+    "GET" "v2/statistics" -> "Statistics";
 
-    Ok(exec!(GetStatistics, modrinth)?.parse()?)
+    /// ### Various statistics about this Modrinth instance
+    ///
+    /// Get the number of projects, versions, version files, and authors on this Modrinth instance.
+    ///
+    /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/statistics/) for more details.
+    fn statistics() -> Statistics
 }

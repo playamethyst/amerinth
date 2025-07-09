@@ -1,9 +1,6 @@
 use crate::{ModrinthError, helpers::use_all};
-pub(crate) use auth::AuthMiddleware;
-pub use auth::{AuthState, Authenticated};
+pub use auth::{AuthMiddleware, AuthState, Authenticated};
 use chrono::{NaiveDate, TimeZone, Utc};
-#[cfg(not(feature = "blocking"))]
-use reqwest::Client as Reqwest;
 #[cfg(feature = "blocking")]
 use rustify::blocking::clients::reqwest::Client;
 #[cfg(not(feature = "blocking"))]
