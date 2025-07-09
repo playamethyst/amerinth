@@ -19,8 +19,8 @@ macro_rules! other_enum {
                 $(#[$var_meta])*
                 $variant
             ),*,
-            $(#[$other_meta])*
             #[strum(disabled)]
+            $(#[$other_meta])*
             $other($other_ty)
         }
 

@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 /// Create an endpoint.
 macro_rules! endpoint {
     (@code $res:expr;) => {
@@ -112,29 +110,3 @@ macro_rules! endpoint {
     };
 }
 pub(crate) use endpoint;
-
-/// A [Vec] wrapper that (de)serializes a list of items in a way the Modrinth API expects.
-pub(crate) struct EndpointVec<T: Debug>(pub(crate) Vec<T>);
-
-impl<T: Debug> std::ops::Deref for EndpointVec<T> {
-    type Target = Vec<T>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T: Debug> std::ops::DerefMut for EndpointVec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T: Debug> serde::Serialize for EndpointVec<T> {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(&format!("{:?}", self.0))
-    }
-}

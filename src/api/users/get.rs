@@ -51,7 +51,14 @@ endpoint! {
 endpoint! {
     "GET" "v2/users" {
         #[endpoint(query)]
-        ids: EndpointVec<String> [EndpointVec(users.clone().into().into_iter().map(|u| u.into()).collect())]
+        ids: DebugFmt<Vec<String>> [
+            users.clone()
+                .into()
+                .into_iter()
+                .map(|u| u.into())
+                .collect::<Vec<_>>()
+                .into()
+        ]
     } -> "Vec<User>";
 
     /// ### Get multiple users
