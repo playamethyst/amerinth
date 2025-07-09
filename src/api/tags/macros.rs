@@ -36,13 +36,13 @@ macro_rules! tag {
                             for value in values {
                                 if let Some(obj) = value.as_object() {
                                     if let Some(key_value) = obj.get($key) {
-                                        if let Some(key_str) = key_value.as_string() {
-                                            let data: $tag = ijson::from_value(value).map_err(|source|
-                                                rustify::errors::ClientError::DataParseError { source: source.into() }
-                                            )?;
-                                            println!("{:?}", key_str);
-                                            map.insert(key_str.to_string().parse()?, data);
-                                        }
+                                        let key = ijson::from_value(key_value).map_err(|source|
+                                            rustify::errors::ClientError::DataParseError { source: source.into() }
+                                        )?;
+                                        let data = ijson::from_value(value).map_err(|source|
+                                            rustify::errors::ClientError::DataParseError { source: source.into() }
+                                        )?;
+                                        map.insert(key, data);
                                     }
                                 }
                             }

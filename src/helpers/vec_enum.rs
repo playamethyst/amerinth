@@ -1,8 +1,8 @@
 /// Create an enum that has a [Vec] wrapper.
-macro_rules! enum_vec {
+macro_rules! vec_enum {
     (
-        $(#[$meta:meta])*
-        enum $name:ident {
+        $(#[$enum_meta:meta])*
+        enum $enum:ident {
             $(
                 $(#[$var_meta:meta])*
                 $variant:ident $((
@@ -16,9 +16,9 @@ macro_rules! enum_vec {
             )
         )?
     ) => {
-        $(#[$meta])*
+        $(#[$enum_meta])*
         #[derive(Debug, Clone)]
-        pub enum $name {
+        pub enum $enum {
             $(
                 $(#[$var_meta])*
                 $variant $((
@@ -30,23 +30,23 @@ macro_rules! enum_vec {
         pastey::paste! {
             $($(#[$vec_meta])*)?
             #[derive(Clone)]
-            pub struct [<$name s>](Vec<$name>);
+            pub struct [<$enum s>](Vec<$enum>);
 
-            impl std::ops::Deref for [<$name s>] {
-                type Target = Vec<$name>;
+            impl std::ops::Deref for [<$enum s>] {
+                type Target = Vec<$enum>;
 
                 fn deref(&self) -> &Self::Target {
                     &self.0
                 }
             }
 
-            impl std::ops::DerefMut for [<$name s>] {
+            impl std::ops::DerefMut for [<$enum s>] {
                 fn deref_mut(&mut self) -> &mut Self::Target {
                     &mut self.0
                 }
             }
 
-            impl std::fmt::Debug for [<$name s>] {
+            impl std::fmt::Debug for [<$enum s>] {
                 fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                     self.0.fmt(f)
                 }
@@ -54,4 +54,4 @@ macro_rules! enum_vec {
         }
     };
 }
-pub(crate) use enum_vec;
+pub(crate) use vec_enum;

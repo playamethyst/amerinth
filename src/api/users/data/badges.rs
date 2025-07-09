@@ -1,7 +1,7 @@
-use crate::helpers::enum_vec;
+use crate::helpers::vec_enum;
 use strum::{EnumIter, IntoEnumIterator};
 
-enum_vec! {
+vec_enum! {
     /// A badge that a user can have on Modrinth.
     ///
     /// Badges are awarded for various contributions to the Modrinth community.

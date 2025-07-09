@@ -27,6 +27,8 @@ pub enum ModrinthError {
 
     #[error(transparent)]
     Infalliable(#[from] std::convert::Infallible),
+    #[error(transparent)]
+    Parse(#[from] strum::ParseError),
 }
 
 #[allow(unused_imports)]

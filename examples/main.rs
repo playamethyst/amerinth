@@ -16,8 +16,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .pat(std::env::var("PAT")?, 31, 7, 2025)?
     .logout();
 
-    let payload = tags::game_versions(&client).await?;
-    println!("{:?}", payload);
+    let payload = tags::loaders(&client).await?;
+    println!("{:?}", payload.keys());
 
     Ok(())
 }

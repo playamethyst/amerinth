@@ -39,7 +39,8 @@ pub enum CategoryHeader {
     Resolutions,
     /// Categories that are related to the performance impact of the project.
     PerformanceImpact,
-    /// A custom or unknown header, represented by a string.
+
+    #[strum(disabled)]
     Other(String),
 }
 deserialize_other!(CategoryHeader);

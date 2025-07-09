@@ -15,7 +15,7 @@ pub enum ProjectSide {
 }
 
 #[cfg(any(feature = "projects", feature = "tags"))]
-enum_vec! {
+vec_enum! {
     /// Types of projects that can be found on Modrinth.
     #[derive(EnumString, Hash, PartialEq, Eq)]
     #[strum(serialize_all = "lowercase")]
@@ -32,7 +32,7 @@ enum_vec! {
         Plugin,
         /// A data pack is a collection of data-driven content that modifies or adds to the game's mechanics.
         DataPack,
-        /// An unknown project type, represented by a string.
+
         #[strum(disabled)]
         Other(String),
     }
