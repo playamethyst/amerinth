@@ -1,36 +1,13 @@
-/// Create an enum that has a [Vec] wrapper.
+/// Create a [Vec] wrapper for an enum.
 macro_rules! vec_enum {
     (
-        $(#[$enum_meta:meta])*
-        enum $enum:ident {
-            $(
-                $(#[$var_meta:meta])*
-                $variant:ident $((
-                    $($field_type:ty),* $(,)?
-                ))? $(= $value:expr)?,
-            )*
-        }
-        $(
-            vec_meta(
-                $(#[$vec_meta:meta])*
-            )
-        )?
+        $vis:vis $enum:ident;
+        $(vec($(#[$vec_meta:meta])*))?
     ) => {
-        $(#[$enum_meta])*
-        #[derive(Debug, Clone)]
-        pub enum $enum {
-            $(
-                $(#[$var_meta])*
-                $variant $((
-                    $($field_type),*
-                ))? $(= $value)?,
-            )*
-        }
-
         pastey::paste! {
             $($(#[$vec_meta])*)?
             #[derive(Clone)]
-            pub struct [<$enum s>](Vec<$enum>);
+            $vis struct [<$enum s>](Vec<$enum>);
 
             impl std::ops::Deref for [<$enum s>] {
                 type Target = Vec<$enum>;

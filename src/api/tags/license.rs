@@ -20,7 +20,7 @@ endpoint! {
     /// ### Errors
     ///
     /// Returns [ModrinthError::NotFound] if the license does not exist.
-    fn license(license: &str) -> License {
+    pub fn license(license: &str) -> License {
         |res| match res {
             Ok(res) => Ok(res.parse()?),
             Err(_) => Err(ModrinthError::NotFound {

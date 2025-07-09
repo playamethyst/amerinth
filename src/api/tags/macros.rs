@@ -5,14 +5,14 @@ macro_rules! tag {
         $endpoint:literal;
 
         $(#[$fn_meta:meta])*
-        fn $fn:ident() -> $tag:ident;
+        $vis:vis fn $fn:ident() -> $tag:ident;
 
         $(#[$struct_meta:meta])*
         [$key:literal: $key_ty:ty] -> {
             $(
                 $(#[$field_meta:meta])*
                 $field:ident: $field_ty:ty
-            ),*
+            ),* $(,)?
         }
     ) => {
         $(#[$struct_meta])*
@@ -27,7 +27,7 @@ macro_rules! tag {
         $crate::helpers::endpoint! {
             "GET" $endpoint -> "ijson::IValue";
             $(#[$fn_meta])*
-            fn $fn() -> std::collections::HashMap<$key_ty, $tag> {
+            $vis fn $fn() -> std::collections::HashMap<$key_ty, $tag> {
                 |res| match res {
                     Ok(res) => {
                         let mut map = std::collections::HashMap::new();
@@ -62,13 +62,13 @@ pub(crate) use tag;
 macro_rules! tag_vec {
     (
         $(#[$fn_meta:meta])*
-        $fn:ident, $tag:ident ($vec_tag:literal), $endpoint:literal;
+        $vis:vis $fn:ident, $tag:ident ($vec_tag:literal), $endpoint:literal;
     ) => {
         $crate::helpers::endpoint! {
             "GET" $endpoint -> $vec_tag;
 
             $(#[$fn_meta])*
-            fn $fn() -> Vec<$tag>
+            $vis fn $fn() -> Vec<$tag>
         }
     };
 }

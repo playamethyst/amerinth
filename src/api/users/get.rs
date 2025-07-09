@@ -20,7 +20,7 @@ endpoint! {
     /// ### Errors
     ///
     /// Returns [ModrinthError::NotFound] if the user does not exist.
-    fn get(user: &str) -> User {
+    pub fn get(user: &str) -> User {
         |res| match res {
             Ok(res) => Ok(res.parse()?),
             Err(_) => Err(ModrinthError::NotFound {
@@ -45,7 +45,7 @@ endpoint! {
     /// ### Errors
     ///
     /// Returns [ModrinthError::Unauthorized] if the user is not authenticated.
-    fn current() -> User
+    pub fn current() -> User
 }
 
 endpoint! {
@@ -67,7 +67,7 @@ endpoint! {
     /// ### Errors
     ///
     /// Returns [ModrinthError::NotFound] if any of the users do not exist.
-    fn many<T: [Clone + Hash + Into<String> + PartialEq + Eq]>(users: impl Clone + Into<Vec<T>>) -> HashMap<T, Option<User>> {
+    pub fn many<T: [Clone + Hash + Into<String> + PartialEq + Eq]>(users: impl Clone + Into<Vec<T>>) -> HashMap<T, Option<User>> {
         |res| match res {
             Ok(res) => {
                 let resolved: Vec<User> = res.parse()?;

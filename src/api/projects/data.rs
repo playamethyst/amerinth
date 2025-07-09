@@ -15,11 +15,11 @@ pub enum ProjectSide {
 }
 
 #[cfg(any(feature = "projects", feature = "tags"))]
-vec_enum! {
+other_enum! {
     /// Types of projects that can be found on Modrinth.
-    #[derive(EnumString, Hash, PartialEq, Eq)]
+    #[derive(Hash, PartialEq, Eq)]
     #[strum(serialize_all = "lowercase")]
-    enum ProjectType {
+    pub enum ProjectType {
         /// A mod is a modification to the game that adds new features, mechanics, or content.
         Mod,
         /// A modpack is a curated collection of mods that are designed to work together.
@@ -32,17 +32,18 @@ vec_enum! {
         Plugin,
         /// A data pack is a collection of data-driven content that modifies or adds to the game's mechanics.
         DataPack,
-
-        #[strum(disabled)]
-        Other(String),
     }
-    vec_meta(
-        #[derive(Hash, PartialEq, Eq)]
-    )
+
+    Other(String)
 }
 
 #[cfg(any(feature = "projects", feature = "tags"))]
-deserialize_other!(ProjectType);
+vec_enum! {
+    pub ProjectType;
+    vec(
+        #[derive(Hash, PartialEq, Eq)]
+    )
+}
 
 #[cfg(any(feature = "projects", feature = "tags"))]
 impl<'de> Deserialize<'de> for ProjectTypes {

@@ -14,7 +14,7 @@ tag! {
     /// Gets an array of categories, their icons, and applicable project types.
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/categorylist/) for more details.
-    fn categories() -> Category;
+    pub fn categories() -> Category;
 
     /// A category that can be applied to a project
     ["name": String] -> {
@@ -27,23 +27,22 @@ tag! {
     }
 }
 
-/// Headers that categories can be grouped under.
-#[derive(Debug, Clone, EnumString)]
-#[strum(serialize_all = "lowercase")]
-pub enum CategoryHeader {
-    /// Categories that are related to the project type.
-    Categories,
-    /// Categories that are related to the features of the project.
-    Features,
-    /// Categories that are related to the resolution(s) of textures in the project.
-    Resolutions,
-    /// Categories that are related to the performance impact of the project.
-    PerformanceImpact,
+other_enum! {
+    /// Headers that categories can be grouped under.
+    #[strum(serialize_all = "lowercase")]
+    pub enum CategoryHeader {
+        /// Categories that are related to the project type.
+        Categories,
+        /// Categories that are related to the features of the project.
+        Features,
+        /// Categories that are related to the resolution(s) of textures in the project.
+        Resolutions,
+        /// Categories that are related to the performance impact of the project.
+        PerformanceImpact,
+    }
 
-    #[strum(disabled)]
-    Other(String),
+    Other(String)
 }
-deserialize_other!(CategoryHeader);
 
 tag! {
     "v2/tag/game_version";
@@ -53,7 +52,7 @@ tag! {
     /// Gets an array of game versions and information about them.
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/versionlist/) for more details.
-    fn game_versions() -> GameVersion;
+    pub fn game_versions() -> GameVersion;
 
     /// A version of a game that a project can target.
     ["version": String] -> {
@@ -82,7 +81,7 @@ tag_vec! {
     /// Gets an array of valid project types.
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/projecttypelist/) for more details.
-    project_types, ProjectType ("Vec<ProjectType>"), "v2/tag/project_type";
+    pub project_types, ProjectType ("Vec<ProjectType>"), "v2/tag/project_type";
 }
 
 tag_vec! {
@@ -91,7 +90,7 @@ tag_vec! {
     /// Gets an array of valid project sides.
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/sidetypelist/) for more details.
-    side_types, ProjectSide ("Vec<ProjectSide>"), "v2/tag/side_type";
+    pub side_types, ProjectSide ("Vec<ProjectSide>"), "v2/tag/side_type";
 }
 
 tag_vec! {
@@ -100,7 +99,7 @@ tag_vec! {
     /// Gets an array of valid report types.
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/reporttypelist/) for more details.
-    report_types, ReportType ("Vec<ReportType>"), "v2/tag/report_type";
+    pub report_types, ReportType ("Vec<ReportType>"), "v2/tag/report_type";
 }
 
 /// A report type supported by Modrinth.

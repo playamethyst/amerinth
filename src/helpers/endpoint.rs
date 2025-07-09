@@ -19,7 +19,7 @@ macro_rules! endpoint {
             [$(
                 $(#[$field_meta:meta])*
                 $end_arg:ident: $end_ty:ty [$($end_val:tt)*]
-            ),*]
+            ),* $(,)?]
         )?
     ) => {
         #[allow(redundant_semicolons)]
@@ -50,12 +50,12 @@ macro_rules! endpoint {
             $(
                 $(#[$field_meta:meta])*
                 $end_arg:ident: $end_ty:ty [$($end_val:tt)*]
-            ),*
+            ),* $(,)?
         })? -> $response:literal $([$auth:ident])?;
         $(#[$fn_meta:meta])*
-        fn $name:ident$(<
+        $vis:vis fn $name:ident$(<
             $($lifetime:lifetime),* $(,)?
-            $($generic:ident $(: [$($bounds:tt)+])?),* $(,)?
+            $($generic:ident $(: [$($bounds:tt)+])?),*
         >)?(
             $($arg:ident: $arg_ty:ty),*
         ) -> $return_ty:ty $({
@@ -64,7 +64,7 @@ macro_rules! endpoint {
     ) => {
         $(#[$fn_meta])*
         #[cfg(not(feature = "blocking"))]
-        pub async fn $name<
+        $vis async fn $name<
             $($($lifetime,)*)?
             Auth: $crate::client::AuthState $(+ $crate::client::$auth)?,
             $($(
@@ -88,7 +88,7 @@ macro_rules! endpoint {
 
         $(#[$fn_meta])*
         #[cfg(feature = "blocking")]
-        pub fn $name<
+        $vis fn $name<
             $($($lifetime,)*)?
             Auth: $crate::client::AuthState $(+ $crate::client::$auth)?,
             $($(

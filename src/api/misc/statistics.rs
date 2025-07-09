@@ -21,5 +21,5 @@ endpoint! {
     /// Get the number of projects, versions, version files, and authors on this Modrinth instance.
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/statistics/) for more details.
-    fn statistics() -> Statistics
+    pub fn statistics() -> Statistics
 }

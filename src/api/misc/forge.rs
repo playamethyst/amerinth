@@ -19,17 +19,6 @@ pub struct Promo {
     pub latest: String,
 }
 
-// #[derive(Endpoint)]
-// #[endpoint(
-//     method = "GET",
-//     path = "updates/{self.project}/forge_updates.json",
-//     response = "ForgeUpdates"
-// )]
-// struct GetForgeUpdates {
-//     #[endpoint(skip)]
-//     project: String,
-// }
-
 endpoint! {
     "GET" "updates/{self.project}/forge_updates.json" {
         #[endpoint(skip)]
@@ -50,7 +39,7 @@ endpoint! {
     /// ### Errors
     ///
     /// Returns [ModrinthError::NotFound] if the project does not exist.
-    fn forge(project: &str) -> ForgeUpdates {
+    pub fn forge(project: &str) -> ForgeUpdates {
         |res| match res {
             Ok(res) => Ok(res.parse()?),
             Err(_) => Err(ModrinthError::NotFound {

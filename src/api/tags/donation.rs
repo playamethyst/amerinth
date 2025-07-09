@@ -8,7 +8,7 @@ endpoint! {
     /// Gets an array of donation platforms and information about them.
     ///
     /// See the [Modrinth API docs](https://docs.modrinth.com/api/operations/donationplatformlist/) for more details.
-    fn donation_platforms() -> Vec<DonationPlatform> {
+    pub fn donation_platforms() -> Vec<DonationPlatform> {
         |res| match res {
             Ok(res) => {
                 let mut platforms = Vec::new();
